@@ -194,19 +194,63 @@ def detect_changes(current: dict, previous: dict) -> list:
 # Sumário via Gemini AI (opcional)
 # ---------------------------------------------------------------------------
 
-def generate_ai_summary(changes_text: str) -> str | None:
-    """Chama o Gemini 2.5 Flash para gerar um sumário executivo da daily."""
+def generate_ai_summary(
+    new_sprint: list,
+    new_backlog: list,
+    changed: list,
+) -> str | None:
+    """Chama o Gemini 2.5 Flash para gerar um relatório de daily em linguagem natural."""
     if not GEMINI_API_KEY:
         return None
     try:
         from google import genai
         client = genai.Client(api_key=GEMINI_API_KEY)
+
+        # Monta um contexto detalhado e estruturado para o modelo
+        context_lines = []
+
+        if new_sprint:
+            context_lines.append("=== NOVOS CARDS NA SPRINT ===")
+            for item in new_sprint:
+                i = item["issue"]
+                sp = f"{i['story_points']} pts" if i["story_points"] else "sem estimativa"
+                resp = i["assignee"] or "sem responsável"
+                context_lines.append(
+                    f"- {i['key']}: {i['summary']} | Status: {i['status']} | Responsável: {resp} | SP: {sp} | Sprint: {i['sprint'] or 'backlog'}"
+                )
+
+        if new_backlog:
+            context_lines.append("\n=== NOVOS CARDS NO BACKLOG ===")
+            for item in new_backlog:
+                i = item["issue"]
+                sp = f"{i['story_points']} pts" if i["story_points"] else "sem estimativa"
+                resp = i["assignee"] or "sem responsável"
+                context_lines.append(
+                    f"- {i['key']}: {i['summary']} | Status: {i['status']} | Responsável: {resp} | SP: {sp}"
+                )
+
+        if changed:
+            context_lines.append("\n=== CARDS COM MUDANÇAS ===")
+            for item in changed:
+                i = item["issue"]
+                mudancas = "; ".join(
+                    c.replace("*", "").replace("`", "") for c in item["changes"]
+                )
+                context_lines.append(f"- {i['key']}: {i['summary']} | {mudancas}")
+
+        context = "\n".join(context_lines)
+
         prompt = (
-            "Você é um Scrum Master experiente. Com base nas mudanças abaixo no Jira, "
-            "gere um resumo executivo curto para a daily em português (máximo 5 tópicos). "
-            "Destaque riscos, bloqueios e avanços relevantes. Seja direto e objetivo.\n\n"
-            f"Mudanças:\n{changes_text}"
+            "Você é um Scrum Master experiente fazendo o resumo diario da equipe.\n"
+            "Com base nos dados de hoje do Jira abaixo, escreva um relatório executivo "
+            "em português, em linguagem natural e fluida (não use listas de tópicos), "
+            "como se estivesse falando para o time no começo do dia.\n"
+            "Mencione: o que está em andamento, o que foi concluído ou mudou, "
+            "quem está tocando o queêê, e se há pontos de atenção ou riscos.\n"
+            "Use no máximo 5 parágrafos curtos. Não repita os IDs dos cards no corpo do texto.\n\n"
+            f"{context}"
         )
+
         response = client.models.generate_content(
             model="gemini-2.5-flash-preview-04-17",
             contents=prompt,
@@ -246,6 +290,21 @@ def _issue_block(issue: dict, detail_lines: list) -> dict:
     }
 
 
+def _compact_issue_line(issue: dict, changes: list | None = None) -> str:
+    """Gera uma linha de texto compacta para o apêndice de referência."""
+    resp = f" • {issue['assignee']}" if issue["assignee"] else ""
+    sp = f" • {issue['story_points']} pts" if issue["story_points"] else ""
+    status = f" • `{issue['status']}`"
+    line = f"<{issue['link']}|{issue['key']}> — {issue['summary']}{status}{resp}{sp}"
+    if changes:
+        # Resume cada mudança em texto simples
+        change_summary = "; ".join(
+            c.replace("*", "").replace("`", "") for c in changes
+        )
+        line += f"\n  ↳ {change_summary}"
+    return line
+
+
 def build_slack_payload(
     new_sprint: list,
     new_backlog: list,
@@ -262,55 +321,60 @@ def build_slack_payload(
         },
         {
             "type": "context",
-            "elements": [
-                {
-                    "type": "mrkdwn",
-                    "text": f"📅 {now}  |  *{total} alteração(ões) detectada(s)*",
-                }
-            ],
+            "elements": [{
+                "type": "mrkdwn",
+                "text": f"📅 {now}  |  *{total} alteração(ões) detectada(s)*",
+            }],
         },
         {"type": "divider"},
     ]
 
-    # Bloco de IA
+    # --- BLOCO PRINCIPAL: resümo da IA em prosa ---
     if ai_summary:
+        # Slack tem limite de 3000 chars por bloco; cortamos se necessário
+        summary_text = ai_summary[:2900] + "…" if len(ai_summary) > 2900 else ai_summary
         blocks += [
             {
                 "type": "section",
-                "text": {"type": "mrkdwn", "text": f"*🤖 Análise da Daily (Gemini)*\n{ai_summary}"},
+                "text": {"type": "mrkdwn", "text": f"🤖 *Análise do Gemini*\n\n{summary_text}"},
             },
             {"type": "divider"},
         ]
+    else:
+        # Sem IA: mostra aviso
+        blocks.append({
+            "type": "context",
+            "elements": [{"type": "mrkdwn", "text": "_🤖 Gemini não configurado — apenas lista de referência_"}],
+        })
 
-    # Novos cards — Sprint
+    # --- APÊNDICE COMPACTO: lista de referência ---
+    appendix_lines = []
+
     if new_sprint:
-        blocks.append({
-            "type": "section",
-            "text": {"type": "mrkdwn", "text": f"*🆕 Novos na Sprint ({len(new_sprint)})*"},
-        })
+        appendix_lines.append(f"\n*🆕 Novos na Sprint ({len(new_sprint)})*")
         for item in new_sprint:
-            blocks.append(_issue_block(item["issue"], [f"🔹 Status: `{item['issue']['status']}`"]))
-        blocks.append({"type": "divider"})
+            appendix_lines.append(_compact_issue_line(item["issue"]))
 
-    # Novos cards — Backlog
     if new_backlog:
-        blocks.append({
-            "type": "section",
-            "text": {"type": "mrkdwn", "text": f"*📋 Novos no Backlog ({len(new_backlog)})*"},
-        })
+        appendix_lines.append(f"\n*📋 Novos no Backlog ({len(new_backlog)})*")
         for item in new_backlog:
-            blocks.append(_issue_block(item["issue"], [f"🔹 Status: `{item['issue']['status']}`"]))
-        blocks.append({"type": "divider"})
+            appendix_lines.append(_compact_issue_line(item["issue"]))
 
-    # Cards com mudanças
     if changed:
-        blocks.append({
-            "type": "section",
-            "text": {"type": "mrkdwn", "text": f"*🔄 Atualizações ({len(changed)})*"},
-        })
+        appendix_lines.append(f"\n*� Atualizados ({len(changed)})*")
         for item in changed:
-            blocks.append(_issue_block(item["issue"], item["changes"]))
-        blocks.append({"type": "divider"})
+            appendix_lines.append(_compact_issue_line(item["issue"], item["changes"]))
+
+    if appendix_lines:
+        # Slack: máx 3000 chars por bloco de texto
+        appendix_text = "\n".join(appendix_lines)
+        # Quebra em chunks de 2800 chars se necessário
+        chunks = [appendix_text[i:i+2800] for i in range(0, len(appendix_text), 2800)]
+        for chunk in chunks:
+            blocks.append({
+                "type": "section",
+                "text": {"type": "mrkdwn", "text": chunk},
+            })
 
     blocks.append({
         "type": "context",
@@ -442,15 +506,8 @@ def main():
     ai_summary = None
     if GEMINI_API_KEY:
         print("Gerando sumário com Gemini...")
-        lines = []
-        for item in new_sprint:
-            lines.append(f"[NOVO na SPRINT] {item['issue']['key']}: {item['issue']['summary']} — {item['issue']['status']}")
-        for item in new_backlog:
-            lines.append(f"[NOVO no BACKLOG] {item['issue']['key']}: {item['issue']['summary']}")
-        for item in changed:
-            lines.append(f"[ATUALIZADO] {item['issue']['key']}: {item['issue']['summary']}")
-            lines += [f"  {c}" for c in item["changes"]]
-        ai_summary = generate_ai_summary("\n".join(lines))
+        ai_summary = generate_ai_summary(new_sprint, new_backlog, changed)
+
 
     payload = build_slack_payload(new_sprint, new_backlog, changed, ai_summary)
     send_alert(payload)
