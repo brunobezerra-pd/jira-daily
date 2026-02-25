@@ -17,8 +17,8 @@ LAST_STATE_FILE = "last_state.json"
 def get_recent_issues():
     """Busca as issues modificadas nas últimas 24h usando a API do Jira."""
     
-    # Usa API v3 com POST (formato moderno recomendado pelo Jira Cloud)
-    url = f"https://{JIRA_DOMAIN}.atlassian.net/rest/api/3/search"
+    # Endpoint atual do Jira Cloud (/search foi depreciado e retorna 410)
+    url = f"https://{JIRA_DOMAIN}.atlassian.net/rest/api/3/search/jql"
     
     # Sem aspas no project key para JQL simples
     jql = f"project = {JIRA_PROJECT_KEY} AND updated >= -1d ORDER BY updated DESC"
