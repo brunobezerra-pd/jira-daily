@@ -13,13 +13,19 @@ LAST_STATE_FILE = "last_state.json"
 
 def get_recent_issues():
     """Busca as issues modificadas nas últimas 24h usando a API do Jira."""
-    url = f"https://{JIRA_DOMAIN}.atlassian.net/rest/api/3/search"
+    
+    # Trata o domínio caso o usuário tenha colado a URL completa
+    domain = JIRA_DOMAIN.replace("https://", "").replace("http://", "").replace(".atlassian.net", "").strip("/")
+    
+    # Mudando para v2 que é mais compatível em diversas instâncias
+    url = f"https://{domain}.atlassian.net/rest/api/2/search"
     
     jql = f"project = '{JIRA_PROJECT_KEY}' AND updated >= '-24h'"
     
     auth = (JIRA_EMAIL, JIRA_API_TOKEN)
     headers = {
-        "Accept": "application/json"
+        "Accept": "application/json",
+        "Content-Type": "application/json"
     }
     
     query = {
