@@ -297,13 +297,15 @@ def generate_ai_summary(
         context = "\n".join(context_lines)
 
         prompt = (
-            "Você é um Scrum Master experiente fazendo o resumo diário da equipe de produto.\n"
-            "Com base nos dados de hoje do Jira abaixo, escreva um relatório executivo "
-            "em português, em linguagem natural e fluida (não use listas de tópicos), "
-            "como se estivesse falando para o time de Produto no começo do dia.\n"
-            "Organize mentalmente por épico ao falar sobre o progresso, destacando "
-            "quais épicos avançaram, quem está tocando o quê, e se há pontos de atenção ou riscos.\n"
-            "Use no máximo 5 parágrafos curtos. Não repita os IDs dos cards no corpo do texto.\n\n"
+            "Você é um analista ágil gerando um relatório executivo das últimas 24 horas de Sprint para o Product Owner, "
+            "Product Manager e Gerente de Tecnologia.\n\n"
+            "Regras:\n"
+            "- Escreva em português, em 3–4 parágrafos objetivos e concisos.\n"
+            "- Não use saudções, não se dirija ao time; escreva como um relatório, não como um discurso.\n"
+            "- Priorize na ordem: Concluído > Ready for Production > Staging > Code Review > Em Andamento > Pendente.\n"
+            "- Agrupe por épico onde possível.\n"
+            "- Destaque itens sem responsável ou sem estimativa como riscos.\n"
+            "- Não repita os IDs dos cards no texto.\n\n"
             f"{context}"
         )
 
@@ -328,29 +330,48 @@ def generate_ai_summary(
 # Formatação Slack Block Kit
 # ---------------------------------------------------------------------------
 
-def _issue_card_block(issue: dict, changes: list | None = None) -> dict:
+def _issue_card_block(issue: dict, changes: list | None = None, prev_status: str | None = None) -> dict:
     """
-    Cria um bloco Slack rico (section + botão Abrir) com todos os metadados:
-    título, status, assignee, reporter, story points e changesets.
+    Bloco Slack rico (section + botão Abrir).
+    Layout:
+      *MB-xxxx* — Título
+      👤 `Assignee`
+      ✍️ `Reporter`          (omitido se igual ao assignee)
+      🔹 Status: `STATUS`   (+ "antes: PREV" ou "sem mudança de status")
+      🎯 `N pts`  |  📌 `Sprint`
+      [mudanças que não sejam de status]
     """
-    # Linha 1: assignee + reporter (omite reporter se igual ao assignee)
     assignee = issue.get("assignee") or "Sem responsável"
     reporter = issue.get("reporter")
+    sprint = issue.get("sprint") or "Backlog"
+    sp = issue.get("story_points")
+
+    lines = [f"*<{issue['link']}|{issue['key']}>* — {issue['summary']}"]
+    lines.append(f"👤 `{assignee}`")
     if reporter and reporter != assignee:
-        people = f"👤 `{assignee}`  ✍️ `{reporter}`"
+        lines.append(f"✍️ `{reporter}`")
+
+    # Status com indicação do anterior
+    if prev_status and prev_status != issue["status"]:
+        lines.append(f"🔹 Status: `{issue['status']}`  _(antes: `{prev_status}`)_")
+    elif prev_status and prev_status == issue["status"]:
+        lines.append(f"🔹 Status: `{issue['status']}`  _(sem mudança de status)_")
     else:
-        people = f"👤 `{assignee}`"
+        lines.append(f"🔹 Status: `{issue['status']}`")
 
-    # Linha 2: status + story points
-    sp = f"  🎯 `{issue['story_points']} pts`" if issue["story_points"] else ""
-    status_line = f"🔹 Status: `{issue['status']}`{sp}"
+    # Story points + sprint na mesma linha
+    sp_text = f"🎯 `{sp} pts`" if sp else ""
+    sprint_text = f"📌 `{sprint}`"
+    meta_line = "  |  ".join(filter(None, [sp_text, sprint_text]))
+    lines.append(meta_line)
 
-    text = f"*<{issue['link']}|{issue['key']}>* — {issue['summary']}\n{people}\n{status_line}"
-
-    # Linha 3+: mudanças (quando existirem)
+    # Mudanças: filtra a de status (já exibida acima)
     if changes:
-        text += "\n" + "\n".join(changes)
+        non_status = [c for c in changes if "Status:" not in c]
+        if non_status:
+            lines.append("\n".join(non_status))
 
+    text = "\n".join(lines)
     return {
         "type": "section",
         "text": {"type": "mrkdwn", "text": text},
@@ -429,7 +450,8 @@ def build_slack_payload(
             })
             for item in group_items:
                 changes = item.get("changes") if show_changes else None
-                blocks.append(_issue_card_block(item["issue"], changes))
+                prev_status = item.get("prev_status") if show_changes else None
+                blocks.append(_issue_card_block(item["issue"], changes, prev_status))
         blocks.append({"type": "divider"})
 
     # Novos épicos
@@ -562,7 +584,11 @@ def main():
             # Card existente — detecta mudanças
             diffs = detect_changes(issue, last_state[key])
             if diffs:
-                changed.append({"issue": issue, "changes": diffs})
+                changed.append({
+                    "issue": issue,
+                    "changes": diffs,
+                    "prev_status": last_state[key].get("status"),
+                })
 
     if not (new_sprint or new_backlog or changed):
         print("Nenhuma mudança detectada.")
