@@ -1,90 +1,485 @@
 {
     "MB-4441": {
         "status": "Ready for production",
-        "summary": "[APP] Teste A/B"
+        "summary": "[APP] Teste A/B",
+        "assignee": "Eduardo Farias",
+        "story_points": null,
+        "sprint": "Sprint 36"
     },
     "MB-4284": {
         "status": "CODE REVIEW",
-        "summary": "[F] Visualização de notificação enviada (geral)"
+        "summary": "[F] Visualização de notificação enviada (geral)",
+        "assignee": "Rodrigo Klein",
+        "story_points": null,
+        "sprint": "Sprint 36"
     },
     "MB-4227": {
         "status": "EM ANDAMENTO",
-        "summary": "Listagem dos Workspaces de um membro"
+        "summary": "Listagem dos Workspaces de um membro",
+        "assignee": "Rafael Zago",
+        "story_points": null,
+        "sprint": "Sprint 36"
     },
     "MB-4414": {
         "status": "CODE REVIEW",
-        "summary": "Retornar Workspace"
+        "summary": "Retornar Workspace",
+        "assignee": "Rafael Zago",
+        "story_points": null,
+        "sprint": "Sprint 36"
     },
     "MB-4446": {
         "status": "EM ANDAMENTO",
-        "summary": "[F] Página para visualizar workspace"
+        "summary": "[F] Página para visualizar workspace",
+        "assignee": "Rafael Zago",
+        "story_points": null,
+        "sprint": "Sprint 36"
     },
     "MB-4447": {
         "status": "Concluído",
-        "summary": "[B] Retornar workspace por ID"
+        "summary": "[B] Retornar workspace por ID",
+        "assignee": "Rafael Zago",
+        "story_points": null,
+        "sprint": "Sprint 36"
     },
     "MB-4237": {
         "status": "EM ANDAMENTO",
-        "summary": "[F] Implementar listagem de workspaces"
+        "summary": "[F] Implementar listagem de workspaces",
+        "assignee": "Rafael Zago",
+        "story_points": null,
+        "sprint": "Sprint 36"
     },
     "MB-4236": {
         "status": "EM ANDAMENTO",
-        "summary": "[B] Implementar fetch workspaces"
+        "summary": "[B] Implementar fetch workspaces",
+        "assignee": "Rafael Zago",
+        "story_points": null,
+        "sprint": "Sprint 36"
     },
     "MB-4432": {
         "status": "Concluído",
-        "summary": "[F] Criar workspace"
-    },
-    "MB-4459": {
-        "status": "Tarefas pendentes",
-        "summary": "[F] [SIC] Adicionar defesas MIS Completa e MIS Simples nas opções de gerar apresentação"
+        "summary": "[F] Criar workspace",
+        "assignee": "Rafael Zago",
+        "story_points": null,
+        "sprint": "Sprint 36"
     },
     "MB-4379": {
         "status": "Tarefas pendentes",
-        "summary": "[B] Adição dos templates de keynote MIS"
-    },
-    "MB-4180": {
-        "status": "Concluído",
-        "summary": "[F] [SIC] Atualizar design e botões de ação do cabeçalho de propostas"
+        "summary": "[B] Adição dos templates de keynote MIS",
+        "assignee": "Flávio Neto",
+        "story_points": null,
+        "sprint": "Sprint 36"
     },
     "MB-4458": {
         "status": "Tarefas pendentes",
-        "summary": "[F] Desabilitar opções de Defesas MIS no recrutamento da proposta"
+        "summary": "[F] Desabilitar opções de Defesas MIS no recrutamento da proposta",
+        "assignee": null,
+        "story_points": null,
+        "sprint": "Sprint 36"
     },
     "MB-4457": {
         "status": "Ready for staging",
-        "summary": "[B] Atualizar seed de test do campaign server"
+        "summary": "[B] Atualizar seed de test do campaign server",
+        "assignee": "glauber.bispo",
+        "story_points": null,
+        "sprint": "Sprint 36"
     },
     "MB-4456": {
         "status": "Tarefas pendentes",
-        "summary": "[F] Adicionar feature flag para exportar defesas não implementadas"
+        "summary": "[F] Adicionar feature flag para exportar defesas não implementadas",
+        "assignee": null,
+        "story_points": null,
+        "sprint": "Sprint 36"
     },
     "MB-4455": {
         "status": "CODE REVIEW",
-        "summary": "[B] Atualização Zod"
-    },
-    "MB-3762": {
-        "status": "Tarefas pendentes",
-        "summary": "[B] Retornar recompensa (by creator)"
+        "summary": "[B] Atualização Zod",
+        "assignee": "Bruno Franco Puzoni",
+        "story_points": null,
+        "sprint": "Sprint 36"
     },
     "MB-4451": {
         "status": "Concluído",
-        "summary": "Criar service para persistência de CreatorNotification"
+        "summary": "Criar service para persistência de CreatorNotification",
+        "assignee": "glauber.bispo",
+        "story_points": null,
+        "sprint": "Sprint 36"
     },
     "MB-4452": {
         "status": "Concluído",
-        "summary": "Integrar service de persistência aos listeners de notificação"
+        "summary": "Integrar service de persistência aos listeners de notificação",
+        "assignee": "glauber.bispo",
+        "story_points": null,
+        "sprint": "Sprint 36"
     },
     "MB-4453": {
         "status": "Concluído",
-        "summary": "Criar CreatorNotificationRepository"
-    },
-    "MB-4449": {
-        "status": "EM ANDAMENTO",
-        "summary": "[APP] - Melhorar regex de validação de e-mail"
+        "summary": "Criar CreatorNotificationRepository",
+        "assignee": "glauber.bispo",
+        "story_points": null,
+        "sprint": "Sprint 36"
     },
     "MB-4450": {
         "status": "EM ANDAMENTO",
-        "summary": "[B] - Configuração ambiente."
+        "summary": "[B] - Configuração ambiente.",
+        "assignee": "Eduardo Farias",
+        "story_points": null,
+        "sprint": "Sprint 36"
+    },
+    "MB-4454": {
+        "status": "Concluído",
+        "summary": "Investigar incidente com instancia EC2 Gitlab",
+        "assignee": "Victor Souza",
+        "story_points": null,
+        "sprint": "Sprint 36"
+    },
+    "MB-4307": {
+        "status": "In Staging",
+        "summary": "[F] Filtros para edição de notificação do tipo geral",
+        "assignee": "Rodrigo Klein",
+        "story_points": null,
+        "sprint": "Sprint 36"
+    },
+    "MB-4200": {
+        "status": "In Staging",
+        "summary": "[F] Cancelar pedidos de pagamento na aba do Financeiro",
+        "assignee": "Bruno Franco Puzoni",
+        "story_points": null,
+        "sprint": "Sprint 36"
+    },
+    "MB-4412": {
+        "status": "CODE REVIEW",
+        "summary": "Criar Workspace",
+        "assignee": "Rafael Zago",
+        "story_points": null,
+        "sprint": "Sprint 36"
+    },
+    "MB-4333": {
+        "status": "EM ANDAMENTO",
+        "summary": "[B] Persistir notificações transacionais em CreatorNotifications",
+        "assignee": "glauber.bispo",
+        "story_points": null,
+        "sprint": "Sprint 36"
+    },
+    "MB-4175": {
+        "status": "Concluído",
+        "summary": "Revisar AWS IAM. ",
+        "assignee": "Victor Souza",
+        "story_points": null,
+        "sprint": "Sprint 36"
+    },
+    "MB-4403": {
+        "status": "Ready for production",
+        "summary": "[APP] - Ajustar header da tela de comprovante de envio de nota fiscal",
+        "assignee": "Eduardo Farias",
+        "story_points": null,
+        "sprint": "Sprint 36"
+    },
+    "MB-4402": {
+        "status": "Ready for production",
+        "summary": "[APP] - Fechar teclado ao retornar erro no form os dados bancários",
+        "assignee": "Eduardo Farias",
+        "story_points": null,
+        "sprint": "Sprint 36"
+    },
+    "MB-4448": {
+        "status": "EM ANDAMENTO",
+        "summary": "[B] Unificação das codebases",
+        "assignee": "Matheus Faggi",
+        "story_points": null,
+        "sprint": "Sprint 36"
+    },
+    "MB-4139": {
+        "status": "Tarefas pendentes",
+        "summary": "BUG - alteracao de valor de proposta nao esta afetando a tela de SIC",
+        "assignee": null,
+        "story_points": null,
+        "sprint": "Sprint 36"
+    },
+    "MB-4445": {
+        "status": "Ready for staging",
+        "summary": "[B] Notificação de pagamento abortado",
+        "assignee": "Bruno Franco Puzoni",
+        "story_points": null,
+        "sprint": "Sprint 36"
+    },
+    "MB-3639": {
+        "status": "Ready for staging",
+        "summary": "[B] Desconsiderar etapa em massa baseado em filtros (Roteiro)",
+        "assignee": "glauber.bispo",
+        "story_points": null,
+        "sprint": "Sprint 36"
+    },
+    "MB-4243": {
+        "status": "Ready for staging",
+        "summary": "[B] Estratégia de AccountLookup para inferir providerOwnerId",
+        "assignee": "glauber.bispo",
+        "story_points": null,
+        "sprint": "Sprint 36"
+    },
+    "MB-4442": {
+        "status": "EM ANDAMENTO",
+        "summary": "[B] Persistência dos estimates para recrutamentos",
+        "assignee": "Flávio Neto",
+        "story_points": null,
+        "sprint": "Sprint 36"
+    },
+    "MB-4276": {
+        "status": "Ready for staging",
+        "summary": "[F] Refactor da validação de celular no mis-web",
+        "assignee": "glauber.bispo",
+        "story_points": null,
+        "sprint": "Sprint 36"
+    },
+    "MB-4444": {
+        "status": "Ready for staging",
+        "summary": "[B] Salvar a extensão do arquivo no google drive em create-content-files e create-script-files",
+        "assignee": "glauber.bispo",
+        "story_points": null,
+        "sprint": "Sprint 36"
+    },
+    "MB-4374": {
+        "status": "Concluído",
+        "summary": "Instagram Marketing API",
+        "assignee": "Matheus Faggi",
+        "story_points": null,
+        "sprint": "Sprint 36"
+    },
+    "MB-4431": {
+        "status": "Concluído",
+        "summary": "[B] Criar workspace",
+        "assignee": "Rafael Zago",
+        "story_points": null,
+        "sprint": "Sprint 36"
+    },
+    "MB-4439": {
+        "status": "Concluído",
+        "summary": "[F] Adicionar escopo para propostas",
+        "assignee": "Cassiano Peixoto",
+        "story_points": null,
+        "sprint": "Sprint 36"
+    },
+    "MB-4324": {
+        "status": "In Staging",
+        "summary": "[F] Visualização de notificação enviada (campanha)",
+        "assignee": "Rodrigo Klein",
+        "story_points": null,
+        "sprint": "Sprint 36"
+    },
+    "MB-4398": {
+        "status": "Tarefas pendentes",
+        "summary": "[B] Mapeamento de novos campos Instagram",
+        "assignee": "Flávio Neto",
+        "story_points": null,
+        "sprint": "Sprint 36"
+    },
+    "MB-4390": {
+        "status": "EM ANDAMENTO",
+        "summary": "Revisar AS/HPA em Kubernetes",
+        "assignee": "Victor Souza",
+        "story_points": null,
+        "sprint": "Sprint 36"
+    },
+    "MB-4435": {
+        "status": "EM ANDAMENTO",
+        "summary": "[B] [SPIKE] Criar módulo de validação com IA que vai substituir o content-guard no Campaign Service",
+        "assignee": "Cassiano Peixoto",
+        "story_points": null,
+        "sprint": "Sprint 36"
+    },
+    "MB-4313": {
+        "status": "Concluído",
+        "summary": "[B] Endpoint para edição da notificação do tipo campanha",
+        "assignee": "glauber.bispo",
+        "story_points": null,
+        "sprint": "Sprint 36"
+    },
+    "MB-4215": {
+        "status": "Concluído",
+        "summary": "Atualizar CreatePostCommentController e UseCase para aceitar parentId",
+        "assignee": null,
+        "story_points": null,
+        "sprint": "Sprint 36"
+    },
+    "MB-4214": {
+        "status": "Concluído",
+        "summary": "Atualizar schema.prisma para suportar replies em comentários",
+        "assignee": null,
+        "story_points": null,
+        "sprint": "Sprint 36"
+    },
+    "MB-4327": {
+        "status": "Concluído",
+        "summary": "Implementar recurso no SDK",
+        "assignee": null,
+        "story_points": null,
+        "sprint": "Sprint 36"
+    },
+    "MB-4216": {
+        "status": "Concluído",
+        "summary": "Atualizar repositórios e mapeadores para suportar parentId em comentários",
+        "assignee": null,
+        "story_points": null,
+        "sprint": "Sprint 36"
+    },
+    "MB-4217": {
+        "status": "Concluído",
+        "summary": "Atualizar presenter dos comentários para incluir replies",
+        "assignee": null,
+        "story_points": null,
+        "sprint": "Sprint 36"
+    },
+    "MB-4218": {
+        "status": "Concluído",
+        "summary": "Ajustar FetchPostCommentsHandler e FetchPostCommentsByCreatorHandler para incluir replies",
+        "assignee": null,
+        "story_points": null,
+        "sprint": "Sprint 36"
+    },
+    "MB-4210": {
+        "status": "Concluído",
+        "summary": "[B] Reply em comentário feito pelo Community Manager",
+        "assignee": "Bruno Artêmio Johann dos Santos",
+        "story_points": null,
+        "sprint": "Sprint 36"
+    },
+    "MB-4375": {
+        "status": "In Staging",
+        "summary": "Upgrade Keycloak para v26 ",
+        "assignee": "Victor Souza",
+        "story_points": null,
+        "sprint": "Sprint 36"
+    },
+    "MB-4395": {
+        "status": "CODE REVIEW",
+        "summary": "[B] Mapeamento de novos campos TikTok",
+        "assignee": "Flávio Neto",
+        "story_points": null,
+        "sprint": "Sprint 36"
+    },
+    "MB-4378": {
+        "status": "Tarefas pendentes",
+        "summary": "Atualizar vídeos de Tutorial Youtube - S3",
+        "assignee": null,
+        "story_points": null,
+        "sprint": "Sprint 36"
+    },
+    "MB-4308": {
+        "status": "CODE REVIEW",
+        "summary": "[APP] - Upgrade Expo",
+        "assignee": "Eduardo Farias",
+        "story_points": null,
+        "sprint": "Sprint 36"
+    },
+    "MB-4401": {
+        "status": "EM ANDAMENTO",
+        "summary": "Adicionar bio ",
+        "assignee": "Flávio Neto",
+        "story_points": null,
+        "sprint": "Sprint 36"
+    },
+    "MB-4396": {
+        "status": "Concluído",
+        "summary": "Adicionar likes_count (request de insights TikTok + TikTokAccountMetrics e schema MongoDB)",
+        "assignee": "Flávio Neto",
+        "story_points": null,
+        "sprint": "Sprint 36"
+    },
+    "MB-4393": {
+        "status": "Concluído",
+        "summary": "Implementar endpoint PATCH /notifications/:notificationId",
+        "assignee": "glauber.bispo",
+        "story_points": null,
+        "sprint": "Sprint 36"
+    },
+    "MB-4394": {
+        "status": "Concluído",
+        "summary": "Atualizar SDK para suportar chamada de edição de notificação de campanha",
+        "assignee": "glauber.bispo",
+        "story_points": null,
+        "sprint": "Sprint 36"
+    },
+    "MB-4399": {
+        "status": "Tarefas pendentes",
+        "summary": "Expandir InstagramAccountMetrics e schema MongoDB (followersCount, engagementRate, likeCount, likeAverage, commentAverage, viewAverage)",
+        "assignee": null,
+        "story_points": null,
+        "sprint": "Sprint 36"
+    },
+    "MB-4397": {
+        "status": "Tarefas pendentes",
+        "summary": "Fallback para creators não-TTCM",
+        "assignee": null,
+        "story_points": null,
+        "sprint": "Sprint 36"
+    },
+    "MB-4392": {
+        "status": "Concluído",
+        "summary": "Atualizar serviço de backend para suportar edição parcial de notificações de campanha",
+        "assignee": "glauber.bispo",
+        "story_points": null,
+        "sprint": "Sprint 36"
+    },
+    "MB-4391": {
+        "status": "Concluído",
+        "summary": "Implementar validação de status 'draft' antes da edição",
+        "assignee": "glauber.bispo",
+        "story_points": null,
+        "sprint": "Sprint 36"
+    },
+    "MB-4295": {
+        "status": "Concluído",
+        "summary": "Implementar atualização de celular com validação no frontend",
+        "assignee": "glauber.bispo",
+        "story_points": null,
+        "sprint": "Sprint 36"
+    },
+    "MB-4294": {
+        "status": "Concluído",
+        "summary": "Atualizar frontend para consumir novos endpoints de validação de celular",
+        "assignee": "glauber.bispo",
+        "story_points": null,
+        "sprint": "Sprint 36"
+    },
+    "MB-4293": {
+        "status": "Concluído",
+        "summary": "Mover validação de celular para área logada do mis-web",
+        "assignee": "glauber.bispo",
+        "story_points": null,
+        "sprint": "Sprint 36"
+    },
+    "MB-4247": {
+        "status": "Concluído",
+        "summary": "Emitir evento AccountUpdatedEvent nos fluxos de atualização de conta (creator-server)",
+        "assignee": "glauber.bispo",
+        "story_points": null,
+        "sprint": "Sprint 36"
+    },
+    "MB-4246": {
+        "status": "Concluído",
+        "summary": "Realizar upsert no AccountLookup ao receber evento (insights-server)",
+        "assignee": "glauber.bispo",
+        "story_points": null,
+        "sprint": "Sprint 36"
+    },
+    "MB-4245": {
+        "status": "Concluído",
+        "summary": "Implementar consumer de eventos account.updated no insights (insights-server AMQP Controller)",
+        "assignee": "glauber.bispo",
+        "story_points": null,
+        "sprint": "Sprint 36"
+    },
+    "MB-4244": {
+        "status": "Concluído",
+        "summary": "Implementar modelo AccountLookup no Mongoose (insights-server)",
+        "assignee": "glauber.bispo",
+        "story_points": null,
+        "sprint": "Sprint 36"
+    },
+    "MB-4459": {
+        "status": "Tarefas pendentes",
+        "summary": "[F] [SIC] Adicionar defesas MIS Completa e MIS Simples nas opções de gerar apresentação",
+        "assignee": null,
+        "story_points": null,
+        "sprint": null
     }
 }
