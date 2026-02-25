@@ -55,31 +55,89 @@ def save_current_state(state):
     with open(LAST_STATE_FILE, "w", encoding="utf-8") as f:
         json.dump(state, f, indent=4, ensure_ascii=False)
 
-def send_alert(message):
-    """Envia um alerta através do Webhook configurado (Slack/Discord)."""
+def build_slack_payload(new_issues, updated_issues):
+    """Constrói um payload rico usando Slack Block Kit."""
+    from datetime import datetime, timezone
+    now = datetime.now(timezone.utc).strftime("%d/%m/%Y às %H:%Mh UTC")
+
+    total = len(new_issues) + len(updated_issues)
+    blocks = [
+        {
+            "type": "header",
+            "text": {"type": "plain_text", "text": "🔔 Resumo Diário do Jira", "emoji": True}
+        },
+        {
+            "type": "context",
+            "elements": [{"type": "mrkdwn", "text": f"📅 {now}  |  *{total} alteração(ões) detectada(s)*"}]
+        },
+        {"type": "divider"}
+    ]
+
+    # Seção: Novas Tarefas
+    if new_issues:
+        blocks.append({
+            "type": "section",
+            "text": {"type": "mrkdwn", "text": f"*🆕 Novas Tarefas ({len(new_issues)})*"}
+        })
+        for issue in new_issues:
+            blocks.append({
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": f"*<{issue['link']}|{issue['key']}>* — {issue['summary']}\n🔹 Status: `{issue['status']}`"
+                },
+                "accessory": {
+                    "type": "button",
+                    "text": {"type": "plain_text", "text": "Abrir no Jira", "emoji": True},
+                    "url": issue['link'],
+                    "action_id": f"open_{issue['key']}"
+                }
+            })
+        blocks.append({"type": "divider"})
+
+    # Seção: Atualizações de Status
+    if updated_issues:
+        blocks.append({
+            "type": "section",
+            "text": {"type": "mrkdwn", "text": f"*🔄 Status Atualizados ({len(updated_issues)})*"}
+        })
+        for issue in updated_issues:
+            blocks.append({
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": f"*<{issue['link']}|{issue['key']}>* — {issue['summary']}\n🔸 `{issue['old_status']}` ➡️ `{issue['status']}`"
+                },
+                "accessory": {
+                    "type": "button",
+                    "text": {"type": "plain_text", "text": "Abrir no Jira", "emoji": True},
+                    "url": issue['link'],
+                    "action_id": f"open_{issue['key']}"
+                }
+            })
+        blocks.append({"type": "divider"})
+
+    # Rodapé
+    blocks.append({
+        "type": "context",
+        "elements": [{"type": "mrkdwn", "text": "_Monitoramento automático via GitHub Actions_"}]
+    })
+
+    return {
+        "text": f"🔔 Resumo Diário do Jira — {total} alteração(ões)",  # fallback para notificações
+        "blocks": blocks
+    }
+
+
+def send_alert(payload):
+    """Envia o payload Block Kit ao Webhook do Slack."""
     if not WEBHOOK_URL:
         print("WEBHOOK_URL não configurado. Imprimindo alerta no console:")
-        print(message)
+        print(json.dumps(payload, indent=2, ensure_ascii=False))
         return
 
-    # Payload compatível com Slack
-    payload_slack = {
-        "text": message
-    }
-    
-    # Payload para Discord
-    payload_discord = {
-        "content": message
-    }
-    
     try:
-        # Tenta enviar como Discord primeiro
-        response = requests.post(WEBHOOK_URL, json=payload_discord)
-        
-        # Se falhar (ex: endpoint diferente ou Bad Request do Slack), tenta formato Slack
-        if response.status_code >= 400:
-            response = requests.post(WEBHOOK_URL, json=payload_slack)
-            
+        response = requests.post(WEBHOOK_URL, json=payload)
         response.raise_for_status()
     except Exception as e:
         print(f"Erro ao enviar webhook: {e}")
@@ -98,37 +156,33 @@ def main():
     last_state = load_last_state()
     current_state = dict(last_state) # Começa com o estado anterior
     
-    alerts = []
-    
+    new_issues = []
+    updated_issues = []
+
     for issue in recent_issues:
         key = issue['key']
         summary = issue['fields'].get('summary', 'Sem resumo')
         status = issue['fields'].get('status', {}).get('name', 'Desconhecido')
-        
         issue_link = f"https://{JIRA_DOMAIN}.atlassian.net/browse/{key}"
-        
-        # Verifica se é uma tarefa nova para o script (não estava no last_state.json)
+
+        issue_data = {"key": key, "summary": summary, "status": status, "link": issue_link}
+
         if key not in last_state:
-            alerts.append(f"🆕 **Nova Tarefa:** [{key}]({issue_link}) - {summary}\n🔹 **Status:** {status}")
+            new_issues.append(issue_data)
         else:
-            # Tarefa já existe, verifica mudança de status
             old_status = last_state[key].get('status')
             if old_status != status:
-                alerts.append(f"🔄 **Status Atualizado:** [{key}]({issue_link}) - {summary}\n🔸 **De:** {old_status} ➡️ **Para:** {status}")
-        
-        # Atualiza o estado da tarefa para ser salvo no final
-        current_state[key] = {
-            "status": status,
-            "summary": summary
-        }
+                updated_issues.append({**issue_data, "old_status": old_status})
 
-    if alerts:
-        alert_message = "🔔 **Resumo Diário do Jira** 🔔\n\n" + "\n\n".join(alerts)
-        send_alert(alert_message)
-        print("Alertas enviados com sucesso!")
+        current_state[key] = {"status": status, "summary": summary}
+
+    if new_issues or updated_issues:
+        payload = build_slack_payload(new_issues, updated_issues)
+        send_alert(payload)
+        print(f"Alertas enviados: {len(new_issues)} nova(s), {len(updated_issues)} atualização(ões).")
     else:
         print("Nenhuma mudança de status ou nova tarefa detectada nas últimas 24h.")
-        
+
     save_current_state(current_state)
     print("Estado atualizado no last_state.json")
 
