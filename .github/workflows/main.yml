@@ -1,0 +1,45 @@
+name: Jira Daily Status Tracker
+
+on:
+  schedule:
+    # Executa todos os dias úteis às 8h UTC (aproximadamente 5h no Brasil)
+    - cron: '0 8 * * 1-5'
+  workflow_dispatch: # Permite execução manual no GitHub
+
+jobs:
+  track-jira:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Necessário para o bot fazer o git commit do novo last_state.json
+
+    steps:
+      - name: Checkout repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Instalar dependências
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Executar script de mapeamento
+        env:
+          JIRA_DOMAIN: ${{ secrets.JIRA_DOMAIN }}
+          JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+          JIRA_PROJECT_KEY: ${{ secrets.JIRA_PROJECT_KEY }}
+          WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
+        run: python jira_tracker.py
+
+      - name: Commit e push das alterações no last_state.json
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add last_state.json
+          
+          # Realiza o commit apenas se houver mudanças no last_state.json
+          git diff --quiet && git diff --staged --quiet || (git commit -m "chore: atualiza last_state.json via github actions" && git push)
