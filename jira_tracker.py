@@ -20,7 +20,7 @@ def get_recent_issues():
     # Mudando para v2 que é mais compatível em diversas instâncias
     url = f"https://{JIRA_DOMAIN}.atlassian.net/rest/api/2/search"
     
-    jql = f"project = '{JIRA_PROJECT_KEY}' AND updated >= '-24h'"
+    jql = f"project = '{JIRA_PROJECT_KEY}' AND updated >= -1d"
     
     auth = (JIRA_EMAIL, JIRA_API_TOKEN)
     headers = {
