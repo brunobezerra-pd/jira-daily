@@ -36,7 +36,7 @@ def _search(jql: str) -> list:
     payload = {
         "jql": jql,
         "fields": [
-            "summary", "status", "assignee",
+            "summary", "status", "assignee", "reporter",
             "story_points", "customfield_10016", "customfield_10028",
             "customfield_10020",   # sprint info
             "issuetype", "priority"
@@ -108,12 +108,14 @@ def normalize_issue(issue: dict) -> dict:
     """Extrai e normaliza os campos relevantes de um issue bruto do Jira."""
     fields = issue.get("fields", {})
     assignee = fields.get("assignee")
+    reporter = fields.get("reporter")
     sprint_name = extract_sprint_name(fields)
     return {
         "key": issue["key"],
         "summary": fields.get("summary", "Sem resumo"),
         "status": fields.get("status", {}).get("name", "Desconhecido"),
         "assignee": assignee.get("displayName") if assignee else None,
+        "reporter": reporter.get("displayName") if reporter else None,
         "story_points": extract_story_points(fields),
         "sprint": sprint_name,
         "link": f"https://{JIRA_DOMAIN}.atlassian.net/browse/{issue['key']}",
@@ -215,8 +217,9 @@ def generate_ai_summary(
                 i = item["issue"]
                 sp = f"{i['story_points']} pts" if i["story_points"] else "sem estimativa"
                 resp = i["assignee"] or "sem responsável"
+                reporter = i.get("reporter") or "desconhecido"
                 context_lines.append(
-                    f"- {i['key']}: {i['summary']} | Status: {i['status']} | Responsável: {resp} | SP: {sp} | Sprint: {i['sprint'] or 'backlog'}"
+                    f"- {i['key']}: {i['summary']} | Status: {i['status']} | Responsável: {resp} | Relator: {reporter} | SP: {sp} | Sprint: {i['sprint'] or 'backlog'}"
                 )
 
         if new_backlog:
@@ -225,8 +228,9 @@ def generate_ai_summary(
                 i = item["issue"]
                 sp = f"{i['story_points']} pts" if i["story_points"] else "sem estimativa"
                 resp = i["assignee"] or "sem responsável"
+                reporter = i.get("reporter") or "desconhecido"
                 context_lines.append(
-                    f"- {i['key']}: {i['summary']} | Status: {i['status']} | Responsável: {resp} | SP: {sp}"
+                    f"- {i['key']}: {i['summary']} | Status: {i['status']} | Responsável: {resp} | Relator: {reporter} | SP: {sp}"
                 )
 
         if changed:
@@ -292,10 +296,11 @@ def _issue_block(issue: dict, detail_lines: list) -> dict:
 
 def _compact_issue_line(issue: dict, changes: list | None = None) -> str:
     """Gera uma linha de texto compacta para o apêndice de referência."""
-    resp = f" • {issue['assignee']}" if issue["assignee"] else ""
+    resp = f" • 👤 {issue['assignee']}" if issue["assignee"] else " • 👤 sem assignee"
+    reporter = f" • ✍️ {issue['reporter']}" if issue.get("reporter") else ""
     sp = f" • {issue['story_points']} pts" if issue["story_points"] else ""
     status = f" • `{issue['status']}`"
-    line = f"<{issue['link']}|{issue['key']}> — {issue['summary']}{status}{resp}{sp}"
+    line = f"<{issue['link']}|{issue['key']}> — {issue['summary']}{status}{resp}{reporter}{sp}"
     if changes:
         # Resume cada mudança em texto simples
         change_summary = "; ".join(
