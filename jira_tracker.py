@@ -307,32 +307,49 @@ def generate_ai_summary(
             f"{context}"
         )
 
-        response = client.models.generate_content(
-            model="gemini-2.5-flash-preview-04-17",
-            contents=prompt,
-        )
-        return response.text.strip()
+        # Tenta modelo estável, com fallback
+        for model_name in ["gemini-2.0-flash", "gemini-1.5-flash"]:
+            try:
+                response = client.models.generate_content(
+                    model=model_name,
+                    contents=prompt,
+                )
+                print(f"Gemini respondeu com modelo: {model_name}")
+                return response.text.strip()
+            except Exception as model_err:
+                print(f"Modelo {model_name} falhou: {model_err}")
+        raise RuntimeError("Todos os modelos Gemini falharam.")
     except Exception as e:
         print(f"Aviso: erro ao chamar Gemini — {e}")
-        return "__GEMINI_ERROR__"  # sentinel: diferencia erro de 'não configurado'
+        return "__GEMINI_ERROR__"
 
 
 # ---------------------------------------------------------------------------
 # Formatação Slack Block Kit
 # ---------------------------------------------------------------------------
 
-def _issue_block(issue: dict, detail_lines: list) -> dict:
-    """Cria um bloco Slack para um card com suas mudanças."""
-    detail_text = "\n".join(detail_lines) if detail_lines else ""
-    assignee_text = f"  👤 `{issue['assignee']}`" if issue["assignee"] else ""
-    sp_text = f"  🎯 `{issue['story_points']} pts`" if issue["story_points"] else ""
-    meta = (assignee_text + sp_text).strip()
+def _issue_card_block(issue: dict, changes: list | None = None) -> dict:
+    """
+    Cria um bloco Slack rico (section + botão Abrir) com todos os metadados:
+    título, status, assignee, reporter, story points e changesets.
+    """
+    # Linha 1: assignee + reporter (omite reporter se igual ao assignee)
+    assignee = issue.get("assignee") or "Sem responsável"
+    reporter = issue.get("reporter")
+    if reporter and reporter != assignee:
+        people = f"👤 `{assignee}`  ✍️ `{reporter}`"
+    else:
+        people = f"👤 `{assignee}`"
 
-    text = f"*<{issue['link']}|{issue['key']}>* — {issue['summary']}"
-    if meta:
-        text += f"\n{meta}"
-    if detail_text:
-        text += f"\n{detail_text}"
+    # Linha 2: status + story points
+    sp = f"  🎯 `{issue['story_points']} pts`" if issue["story_points"] else ""
+    status_line = f"🔹 Status: `{issue['status']}`{sp}"
+
+    text = f"*<{issue['link']}|{issue['key']}>* — {issue['summary']}\n{people}\n{status_line}"
+
+    # Linha 3+: mudanças (quando existirem)
+    if changes:
+        text += "\n" + "\n".join(changes)
 
     return {
         "type": "section",
@@ -341,42 +358,15 @@ def _issue_block(issue: dict, detail_lines: list) -> dict:
             "type": "button",
             "text": {"type": "plain_text", "text": "Abrir", "emoji": True},
             "url": issue["link"],
-            "action_id": f"open_{issue['key']}",
+            "action_id": f"btn_{issue['key']}",
         },
     }
-
-
-def _compact_issue_line(issue: dict, changes: list | None = None) -> str:
-    """
-    Gera entrada de 2 linhas para o apêndice:
-      Linha 1: link + título
-      Linha 2: status | assignee | reporter | story points
-    """
-    assignee = issue["assignee"] or "sem assignee"
-    reporter = issue.get("reporter")
-    sp = f" | {issue['story_points']} pts" if issue["story_points"] else ""
-
-    # Omite o reporter na linha 2 se for igual ao assignee
-    reporter_part = ""
-    if reporter and reporter != assignee:
-        reporter_part = f" | criado por {reporter}"
-
-    meta = f"  `{issue['status']}` | 👤 {assignee}{reporter_part}{sp}"
-
-    line = f"<{issue['link']}|{issue['key']}> — {issue['summary']}\n{meta}"
-
-    if changes:
-        change_summary = "; ".join(
-            c.replace("*", "").replace("`", "") for c in changes
-        )
-        line += f"\n  ↳ {change_summary}"
-    return line
 
 
 def _group_by_epic(items: list) -> dict:
     """
     Agrupa uma lista de {'issue': ...} por épico.
-    Retorna OrderedDict: {'Nome do Épico (MB-xx)': [item, ...], 'Sem épico': [...]}
+    Retorna dict: {'Nome do Épico (MB-xx)': [item, ...], '— Sem épico': [...]}
     """
     from collections import defaultdict
     groups = defaultdict(list)
@@ -407,70 +397,51 @@ def build_slack_payload(
         },
         {
             "type": "context",
-            "elements": [{
-                "type": "mrkdwn",
-                "text": f"📅 {now}  |  *{total} alteração(ões) detectada(s)*",
-            }],
+            "elements": [{"type": "mrkdwn", "text": f"📅 {now}  |  *{total} alteração(ões) detectada(s)*"}],
         },
         {"type": "divider"},
     ]
 
-    # --- BLOCO PRINCIPAL: Resumo da IA em prosa ---
+    # --- IA em prosa ---
     if ai_summary and ai_summary != "__GEMINI_ERROR__":
         summary_text = ai_summary[:2900] + "…" if len(ai_summary) > 2900 else ai_summary
         blocks += [
-            {
-                "type": "section",
-                "text": {"type": "mrkdwn", "text": f"🤖 *Análise do Gemini*\n\n{summary_text}"},
-            },
+            {"type": "section", "text": {"type": "mrkdwn", "text": f"🤖 *Análise do Gemini*\n\n{summary_text}"}},
             {"type": "divider"},
         ]
     elif ai_summary == "__GEMINI_ERROR__":
         blocks.append({
             "type": "context",
-            "elements": [{"type": "mrkdwn", "text": "_⚠️ Não foi possível gerar a análise do Gemini (erro na API). As listas abaixo são a referência completa._"}],
+            "elements": [{"type": "mrkdwn", "text": "_⚠️ Gemini não respondeu (erro na API). As listas abaixo são a referência completa._"}],
         })
-    # (se ai_summary é None = GEMINI_API_KEY não configurado, não mostramos nada sobre IA)
 
-    # --- APÊNDICE COMPACTO agrupado por épico ---
-    appendix_lines = []
-
-    # Novos Épicos (se houver)
-    if new_epics:
-        appendix_lines.append(f"\n*Novos Épicos ({len(new_epics)})*")
-        for epic in new_epics:
-            resp = f" | 👤 {epic['assignee']}" if epic["assignee"] else ""
-            reporter = f" | criado por {epic['reporter']}" if epic.get("reporter") and epic.get("reporter") != epic.get("assignee") else ""
-            appendix_lines.append(f"<{epic['link']}|{epic['key']}> — {epic['summary']}\n  `{epic['status']}`{resp}{reporter}")
-
-    def _render_grouped(items: list, title: str):
-        """Renderiza uma seção agrupada por épico."""
+    def _add_section(items: list, section_title: str, show_changes: bool = False):
+        """Adiciona título de seção + cards agrupados por épico."""
+        if not items:
+            return
+        blocks.append({"type": "section", "text": {"type": "mrkdwn", "text": section_title}})
         groups = _group_by_epic(items)
-        appendix_lines.append(f"\n{title}")
         for epic_label, group_items in groups.items():
-            appendix_lines.append(f"*Épico: {epic_label}*")
-            for item in group_items:
-                line = _compact_issue_line(item["issue"], item.get("changes"))
-                appendix_lines.append(line)
-            appendix_lines.append("")  # linha em branco entre épicos
-
-    if new_sprint:
-        _render_grouped(new_sprint, f"*🆕 Novos na Sprint ({len(new_sprint)})*")
-
-    if new_backlog:
-        _render_grouped(new_backlog, f"*📋 Novos no Backlog ({len(new_backlog)})*")
-
-    if changed:
-        _render_grouped(changed, f"*🔄 Atualizados ({len(changed)})*")
-
-    if appendix_lines:
-        appendix_text = "\n".join(appendix_lines)
-        chunks = [appendix_text[i:i+2800] for i in range(0, len(appendix_text), 2800)]
-        for chunk in chunks:
+            # Cabeçalho do grupo de épico
             blocks.append({
-                "type": "section",
-                "text": {"type": "mrkdwn", "text": chunk},
+                "type": "context",
+                "elements": [{"type": "mrkdwn", "text": f"📌 *Épico: {epic_label}*"}],
             })
+            for item in group_items:
+                changes = item.get("changes") if show_changes else None
+                blocks.append(_issue_card_block(item["issue"], changes))
+        blocks.append({"type": "divider"})
+
+    # Novos épicos
+    if new_epics:
+        blocks.append({"type": "section", "text": {"type": "mrkdwn", "text": f"*📌 Novos Épicos ({len(new_epics)})*"}})
+        for epic in new_epics:
+            blocks.append(_issue_card_block(epic))
+        blocks.append({"type": "divider"})
+
+    _add_section(new_sprint, f"*🆕 Novos na Sprint ({len(new_sprint)})*")
+    _add_section(new_backlog, f"*📋 Novos no Backlog ({len(new_backlog)})*")
+    _add_section(changed, f"*🔄 Atualizados ({len(changed)})*", show_changes=True)
 
     blocks.append({
         "type": "context",
