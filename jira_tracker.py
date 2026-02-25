@@ -21,8 +21,16 @@ GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")  # Opcional
 
 LAST_STATE_FILE = "last_state.json"
 
-# Campo de story points varia por instância; tentamos os dois mais comuns
-STORY_POINTS_FIELDS = ["story_points", "customfield_10016", "customfield_10028"]
+# Campo de story points varia por instância do Jira.
+# Lista dos customfields mais comuns (em ordem de prioridade).
+STORY_POINTS_FIELDS = [
+    "customfield_10016",  # Jira Software cloud (mais comum)
+    "customfield_10028",  # variante comum
+    "customfield_10034",  # outra variante
+    "customfield_10035",  # outra variante
+    "customfield_10040",  # outra variante
+    "story_points",       # alias legário (raramente funciona)
+]
 
 # ---------------------------------------------------------------------------
 # Busca de Issues no Jira
@@ -99,9 +107,26 @@ def extract_story_points(fields: dict):
     """Tenta extrair story points de vários campos customizados."""
     for field in STORY_POINTS_FIELDS:
         val = fields.get(field)
-        if val is not None:
-            return val
+        if isinstance(val, (int, float)) and val > 0:
+            return int(val) if val == int(val) else val
     return None
+
+
+def _log_sp_field_once(fields: dict):
+    """Uma vez por execução, exibe quais campos numéricos estão no issue.
+    Útil para descobrir qual customfield é o Story Points no seu Jira."""
+    numeric = {
+        k: v for k, v in fields.items()
+        if isinstance(v, (int, float)) and v > 0
+        and k.startswith("customfield")
+    }
+    if numeric:
+        print("[DIAGNÓSTICO SP] Campos numéricos encontrados no issue:")
+        for k, v in sorted(numeric.items()):
+            marker = " <-- candidato (está em STORY_POINTS_FIELDS)" if k in STORY_POINTS_FIELDS else ""
+            print(f"  {k}: {v}{marker}")
+    else:
+        print("[DIAGNÓSTICO SP] Nenhum campo numérico com valor > 0 encontrado.")
 
 
 def extract_sprint_name(fields: dict):
@@ -142,13 +167,23 @@ def extract_epic(fields: dict) -> dict | None:
     return None
 
 
+_SP_DIAGNOSTIC_DONE = False
+
+
 def normalize_issue(issue: dict) -> dict:
     """Extrai e normaliza os campos relevantes de um issue bruto do Jira."""
+    global _SP_DIAGNOSTIC_DONE
     fields = issue.get("fields", {})
     assignee = fields.get("assignee")
     reporter = fields.get("reporter")
     sprint_name = extract_sprint_name(fields)
     epic = extract_epic(fields)
+    sp = extract_story_points(fields)
+
+    if not _SP_DIAGNOSTIC_DONE:
+        _log_sp_field_once(fields)
+        _SP_DIAGNOSTIC_DONE = True
+
     return {
         "key": issue["key"],
         "summary": fields.get("summary", "Sem resumo"),
@@ -156,9 +191,9 @@ def normalize_issue(issue: dict) -> dict:
         "issuetype": fields.get("issuetype", {}).get("name", ""),
         "assignee": assignee.get("displayName") if assignee else None,
         "reporter": reporter.get("displayName") if reporter else None,
-        "story_points": extract_story_points(fields),
+        "story_points": sp,
         "sprint": sprint_name,
-        "epic": epic,   # {'key': 'MB-100', 'summary': 'Nome do épico'} ou None
+        "epic": epic,
         "link": f"https://{JIRA_DOMAIN}.atlassian.net/browse/{issue['key']}",
     }
 
