@@ -17,10 +17,11 @@ LAST_STATE_FILE = "last_state.json"
 def get_recent_issues():
     """Busca as issues modificadas nas últimas 24h usando a API do Jira."""
     
-    # Mudando para v2 que é mais compatível em diversas instâncias
-    url = f"https://{JIRA_DOMAIN}.atlassian.net/rest/api/2/search"
+    # Usa API v3 com POST (formato moderno recomendado pelo Jira Cloud)
+    url = f"https://{JIRA_DOMAIN}.atlassian.net/rest/api/3/search"
     
-    jql = f"project = '{JIRA_PROJECT_KEY}' AND updated >= -1d"
+    # Sem aspas no project key para JQL simples
+    jql = f"project = {JIRA_PROJECT_KEY} AND updated >= -1d ORDER BY updated DESC"
     
     auth = (JIRA_EMAIL, JIRA_API_TOKEN)
     headers = {
@@ -28,13 +29,13 @@ def get_recent_issues():
         "Content-Type": "application/json"
     }
     
-    query = {
-        'jql': jql,
-        'fields': 'summary,status',
-        'maxResults': 100
+    payload = {
+        "jql": jql,
+        "fields": ["summary", "status"],
+        "maxResults": 100
     }
     
-    response = requests.get(url, headers=headers, params=query, auth=auth)
+    response = requests.post(url, headers=headers, json=payload, auth=auth)
     response.raise_for_status()
     
     return response.json().get('issues', [])
