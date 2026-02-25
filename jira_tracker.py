@@ -195,20 +195,22 @@ def detect_changes(current: dict, previous: dict) -> list:
 # ---------------------------------------------------------------------------
 
 def generate_ai_summary(changes_text: str) -> str | None:
-    """Chama o Gemini para gerar um sumário executivo da daily."""
+    """Chama o Gemini 2.5 Flash para gerar um sumário executivo da daily."""
     if not GEMINI_API_KEY:
         return None
     try:
-        import google.generativeai as genai
-        genai.configure(api_key=GEMINI_API_KEY)
-        model = genai.GenerativeModel("gemini-2.0-flash")
+        from google import genai
+        client = genai.Client(api_key=GEMINI_API_KEY)
         prompt = (
             "Você é um Scrum Master experiente. Com base nas mudanças abaixo no Jira, "
             "gere um resumo executivo curto para a daily em português (máximo 5 tópicos). "
             "Destaque riscos, bloqueios e avanços relevantes. Seja direto e objetivo.\n\n"
             f"Mudanças:\n{changes_text}"
         )
-        response = model.generate_content(prompt)
+        response = client.models.generate_content(
+            model="gemini-2.5-flash-preview-04-17",
+            contents=prompt,
+        )
         return response.text.strip()
     except Exception as e:
         print(f"Aviso: erro ao chamar Gemini — {e}")
@@ -325,16 +327,59 @@ def build_slack_payload(
 # Envio do Webhook
 # ---------------------------------------------------------------------------
 
+# Limite seguro de blocos por mensagem do Slack (máx permitido: 50)
+SLACK_MAX_BLOCKS = 48
+
+
+def _chunk_blocks(blocks: list, header_blocks: list) -> list[list]:
+    """
+    Divide uma lista de blocos em páginas que respeitam SLACK_MAX_BLOCKS.
+    O header_blocks é repetido no início de cada página.
+    Retorna uma lista de listas de blocos.
+    """
+    pages = []
+    # Blocos que não são o cabeçalho
+    content = blocks[len(header_blocks):]
+    page = list(header_blocks)
+    for block in content:
+        if len(page) + 1 > SLACK_MAX_BLOCKS:
+            pages.append(page)
+            page = list(header_blocks)
+        page.append(block)
+    if page:
+        pages.append(page)
+    return pages
+
+
 def send_alert(payload: dict):
+    """Envia o payload Block Kit ao Webhook do Slack, paginando se necessário."""
     if not WEBHOOK_URL:
         print("WEBHOOK_URL não configurado. Imprimindo payload no console:")
         print(json.dumps(payload, indent=2, ensure_ascii=False))
         return
-    try:
-        response = requests.post(WEBHOOK_URL, json=payload)
-        response.raise_for_status()
-    except Exception as e:
-        print(f"Erro ao enviar webhook: {e}")
+
+    blocks = payload.get("blocks", [])
+    # Identifica o cabeçalho (primeiros 3 blocos: header, context, divider)
+    header_blocks = blocks[:3]
+
+    if len(blocks) <= SLACK_MAX_BLOCKS:
+        pages = [payload]
+    else:
+        chunked = _chunk_blocks(blocks, header_blocks)
+        pages = []
+        for i, chunk in enumerate(chunked):
+            pages.append({
+                "text": payload["text"] + (f" (parte {i+1}/{len(chunked)})" if len(chunked) > 1 else ""),
+                "blocks": chunk
+            })
+
+    for i, page_payload in enumerate(pages):
+        try:
+            response = requests.post(WEBHOOK_URL, json=page_payload)
+            response.raise_for_status()
+        except Exception as e:
+            print(f"Erro ao enviar webhook (página {i+1}): {e}")
+
 
 
 # ---------------------------------------------------------------------------
