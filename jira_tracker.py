@@ -314,7 +314,7 @@ def generate_ai_summary(
         return response.text.strip()
     except Exception as e:
         print(f"Aviso: erro ao chamar Gemini — {e}")
-        return None
+        return "__GEMINI_ERROR__"  # sentinel: diferencia erro de 'não configurado'
 
 
 # ---------------------------------------------------------------------------
@@ -347,12 +347,24 @@ def _issue_block(issue: dict, detail_lines: list) -> dict:
 
 
 def _compact_issue_line(issue: dict, changes: list | None = None) -> str:
-    """Gera uma linha de texto compacta para o apêndice de referência."""
-    resp = f" • 👤 {issue['assignee']}" if issue["assignee"] else " • 👤 sem assignee"
-    reporter = f" • ✍️ {issue['reporter']}" if issue.get("reporter") else ""
-    sp = f" • {issue['story_points']} pts" if issue["story_points"] else ""
-    status = f" • `{issue['status']}`"
-    line = f"<{issue['link']}|{issue['key']}> — {issue['summary']}{status}{resp}{reporter}{sp}"
+    """
+    Gera entrada de 2 linhas para o apêndice:
+      Linha 1: link + título
+      Linha 2: status | assignee | reporter | story points
+    """
+    assignee = issue["assignee"] or "sem assignee"
+    reporter = issue.get("reporter")
+    sp = f" | {issue['story_points']} pts" if issue["story_points"] else ""
+
+    # Omite o reporter na linha 2 se for igual ao assignee
+    reporter_part = ""
+    if reporter and reporter != assignee:
+        reporter_part = f" | criado por {reporter}"
+
+    meta = f"  `{issue['status']}` | 👤 {assignee}{reporter_part}{sp}"
+
+    line = f"<{issue['link']}|{issue['key']}> — {issue['summary']}\n{meta}"
+
     if changes:
         change_summary = "; ".join(
             c.replace("*", "").replace("`", "") for c in changes
@@ -404,7 +416,7 @@ def build_slack_payload(
     ]
 
     # --- BLOCO PRINCIPAL: Resumo da IA em prosa ---
-    if ai_summary:
+    if ai_summary and ai_summary != "__GEMINI_ERROR__":
         summary_text = ai_summary[:2900] + "…" if len(ai_summary) > 2900 else ai_summary
         blocks += [
             {
@@ -413,36 +425,34 @@ def build_slack_payload(
             },
             {"type": "divider"},
         ]
-    else:
+    elif ai_summary == "__GEMINI_ERROR__":
         blocks.append({
             "type": "context",
-            "elements": [{"type": "mrkdwn", "text": "_🤖 Gemini não configurado — apenas lista de referência_"}],
+            "elements": [{"type": "mrkdwn", "text": "_⚠️ Não foi possível gerar a análise do Gemini (erro na API). As listas abaixo são a referência completa._"}],
         })
+    # (se ai_summary é None = GEMINI_API_KEY não configurado, não mostramos nada sobre IA)
 
     # --- APÊNDICE COMPACTO agrupado por épico ---
     appendix_lines = []
 
     # Novos Épicos (se houver)
     if new_epics:
-        appendix_lines.append(f"\n*🟣 Novos Épicos ({len(new_epics)})*")
+        appendix_lines.append(f"\n*Novos Épicos ({len(new_epics)})*")
         for epic in new_epics:
-            resp = f" • 👤 {epic['assignee']}" if epic["assignee"] else ""
-            reporter = f" • ✍️ {epic['reporter']}" if epic.get("reporter") else ""
-            appendix_lines.append(f"<{epic['link']}|{epic['key']}> — {epic['summary']} • `{epic['status']}`{resp}{reporter}")
+            resp = f" | 👤 {epic['assignee']}" if epic["assignee"] else ""
+            reporter = f" | criado por {epic['reporter']}" if epic.get("reporter") and epic.get("reporter") != epic.get("assignee") else ""
+            appendix_lines.append(f"<{epic['link']}|{epic['key']}> — {epic['summary']}\n  `{epic['status']}`{resp}{reporter}")
 
     def _render_grouped(items: list, title: str):
         """Renderiza uma seção agrupada por épico."""
         groups = _group_by_epic(items)
         appendix_lines.append(f"\n{title}")
         for epic_label, group_items in groups.items():
-            appendix_lines.append(f"  *🟡 {epic_label}*")
+            appendix_lines.append(f"*Épico: {epic_label}*")
             for item in group_items:
-                line = _compact_issue_line(
-                    item["issue"],
-                    item.get("changes")
-                )
-                # indenta levemente para ficar dentro do grupo
-                appendix_lines.append(f"  {line}")
+                line = _compact_issue_line(item["issue"], item.get("changes"))
+                appendix_lines.append(line)
+            appendix_lines.append("")  # linha em branco entre épicos
 
     if new_sprint:
         _render_grouped(new_sprint, f"*🆕 Novos na Sprint ({len(new_sprint)})*")
