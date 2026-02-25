@@ -317,7 +317,12 @@ def generate_ai_summary(
                     contents=prompt,
                 )
                 print(f"Gemini respondeu com modelo: {model_name}")
-                return response.text.strip()
+                text = response.text.strip()
+                # Gemini usa markdown; Slack usa mrkdwn — converte
+                import re
+                text = re.sub(r'\*\*(.+?)\*\*', r'*\1*', text)   # **bold** → *bold*
+                text = re.sub(r'#{1,6}\s*(.+)', r'*\1*', text)    # # Título → *Título*
+                return text
             except Exception as model_err:
                 print(f"Modelo {model_name} falhou: {model_err}")
         raise RuntimeError("Todos os modelos Gemini falharam.")
