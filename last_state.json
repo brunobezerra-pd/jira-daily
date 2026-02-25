@@ -1,1 +1,90 @@
-{}
+{
+    "MB-4441": {
+        "status": "Ready for production",
+        "summary": "[APP] Teste A/B"
+    },
+    "MB-4284": {
+        "status": "CODE REVIEW",
+        "summary": "[F] Visualização de notificação enviada (geral)"
+    },
+    "MB-4227": {
+        "status": "EM ANDAMENTO",
+        "summary": "Listagem dos Workspaces de um membro"
+    },
+    "MB-4414": {
+        "status": "CODE REVIEW",
+        "summary": "Retornar Workspace"
+    },
+    "MB-4446": {
+        "status": "EM ANDAMENTO",
+        "summary": "[F] Página para visualizar workspace"
+    },
+    "MB-4447": {
+        "status": "Concluído",
+        "summary": "[B] Retornar workspace por ID"
+    },
+    "MB-4237": {
+        "status": "EM ANDAMENTO",
+        "summary": "[F] Implementar listagem de workspaces"
+    },
+    "MB-4236": {
+        "status": "EM ANDAMENTO",
+        "summary": "[B] Implementar fetch workspaces"
+    },
+    "MB-4432": {
+        "status": "Concluído",
+        "summary": "[F] Criar workspace"
+    },
+    "MB-4459": {
+        "status": "Tarefas pendentes",
+        "summary": "[F] [SIC] Adicionar defesas MIS Completa e MIS Simples nas opções de gerar apresentação"
+    },
+    "MB-4379": {
+        "status": "Tarefas pendentes",
+        "summary": "[B] Adição dos templates de keynote MIS"
+    },
+    "MB-4180": {
+        "status": "Concluído",
+        "summary": "[F] [SIC] Atualizar design e botões de ação do cabeçalho de propostas"
+    },
+    "MB-4458": {
+        "status": "Tarefas pendentes",
+        "summary": "[F] Desabilitar opções de Defesas MIS no recrutamento da proposta"
+    },
+    "MB-4457": {
+        "status": "Ready for staging",
+        "summary": "[B] Atualizar seed de test do campaign server"
+    },
+    "MB-4456": {
+        "status": "Tarefas pendentes",
+        "summary": "[F] Adicionar feature flag para exportar defesas não implementadas"
+    },
+    "MB-4455": {
+        "status": "CODE REVIEW",
+        "summary": "[B] Atualização Zod"
+    },
+    "MB-3762": {
+        "status": "Tarefas pendentes",
+        "summary": "[B] Retornar recompensa (by creator)"
+    },
+    "MB-4451": {
+        "status": "Concluído",
+        "summary": "Criar service para persistência de CreatorNotification"
+    },
+    "MB-4452": {
+        "status": "Concluído",
+        "summary": "Integrar service de persistência aos listeners de notificação"
+    },
+    "MB-4453": {
+        "status": "Concluído",
+        "summary": "Criar CreatorNotificationRepository"
+    },
+    "MB-4449": {
+        "status": "EM ANDAMENTO",
+        "summary": "[APP] - Melhorar regex de validação de e-mail"
+    },
+    "MB-4450": {
+        "status": "EM ANDAMENTO",
+        "summary": "[B] - Configuração ambiente."
+    }
+}
