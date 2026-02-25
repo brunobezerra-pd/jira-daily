@@ -39,6 +39,8 @@ def _search(jql: str) -> list:
             "summary", "status", "assignee", "reporter",
             "story_points", "customfield_10016", "customfield_10028",
             "customfield_10020",   # sprint info
+            "customfield_10014",   # epic link (legacy)
+            "parent",              # pai direto (moderno — epic vem aqui)
             "issuetype", "priority"
         ],
         "maxResults": 200,
@@ -48,14 +50,15 @@ def _search(jql: str) -> list:
     return response.json().get("issues", [])
 
 
-def get_all_issues() -> list:
+def get_all_issues() -> tuple[list, list]:
     """
-    Retorna issues da sprint ativa + backlog modificado nas últimas 24h.
-    Evita duplicatas usando o issue key como chave.
+    Retorna (issues_regulares, novos_epicos).
+    issues_regulares = sprint ativa + backlog modificado nas últimas 24h.
+    novos_epicos     = épicos criados ou modificados hoje.
     """
     issues_map = {}
 
-    # Sprint ativa (todos os cards, independente de quando foram atualizados)
+    # Sprint ativa
     try:
         sprint_issues = _search(
             f"project = {JIRA_PROJECT_KEY} AND sprint in openSprints() ORDER BY updated DESC"
@@ -75,7 +78,17 @@ def get_all_issues() -> list:
     except Exception as e:
         print(f"Aviso: erro ao buscar backlog — {e}")
 
-    return list(issues_map.values())
+    # Épicos criados ou atualizados nas últimas 24h
+    new_epics = []
+    try:
+        epic_issues = _search(
+            f"project = {JIRA_PROJECT_KEY} AND issuetype = Epic AND updated >= -1d ORDER BY updated DESC"
+        )
+        new_epics = [normalize_issue(e) for e in epic_issues]
+    except Exception as e:
+        print(f"Aviso: erro ao buscar épicos — {e}")
+
+    return list(issues_map.values()), new_epics
 
 
 # ---------------------------------------------------------------------------
@@ -104,20 +117,48 @@ def extract_sprint_name(fields: dict):
     return None
 
 
+def extract_epic(fields: dict) -> dict | None:
+    """
+    Tenta extrair o épico de um card.
+    Suporta o campo moderno 'parent' (quando pai é do tipo Epic)
+    e o campo legado 'customfield_10014' (Epic Link).
+    Retorna dict {'key': ..., 'summary': ...} ou None.
+    """
+    # Modelo moderno: parent com issuetype Epic
+    parent = fields.get("parent")
+    if parent:
+        parent_type = parent.get("fields", {}).get("issuetype", {}).get("name", "")
+        if parent_type == "Epic":
+            return {
+                "key": parent.get("key"),
+                "summary": parent.get("fields", {}).get("summary", parent.get("key")),
+            }
+
+    # Legado: epic link customfield
+    epic_link = fields.get("customfield_10014")
+    if epic_link:
+        return {"key": epic_link, "summary": epic_link}
+
+    return None
+
+
 def normalize_issue(issue: dict) -> dict:
     """Extrai e normaliza os campos relevantes de um issue bruto do Jira."""
     fields = issue.get("fields", {})
     assignee = fields.get("assignee")
     reporter = fields.get("reporter")
     sprint_name = extract_sprint_name(fields)
+    epic = extract_epic(fields)
     return {
         "key": issue["key"],
         "summary": fields.get("summary", "Sem resumo"),
         "status": fields.get("status", {}).get("name", "Desconhecido"),
+        "issuetype": fields.get("issuetype", {}).get("name", ""),
         "assignee": assignee.get("displayName") if assignee else None,
         "reporter": reporter.get("displayName") if reporter else None,
         "story_points": extract_story_points(fields),
         "sprint": sprint_name,
+        "epic": epic,   # {'key': 'MB-100', 'summary': 'Nome do épico'} ou None
         "link": f"https://{JIRA_DOMAIN}.atlassian.net/browse/{issue['key']}",
     }
 
@@ -200,6 +241,7 @@ def generate_ai_summary(
     new_sprint: list,
     new_backlog: list,
     changed: list,
+    new_epics: list,
 ) -> str | None:
     """Chama o Gemini 2.5 Flash para gerar um relatório de daily em linguagem natural."""
     if not GEMINI_API_KEY:
@@ -208,18 +250,26 @@ def generate_ai_summary(
         from google import genai
         client = genai.Client(api_key=GEMINI_API_KEY)
 
-        # Monta um contexto detalhado e estruturado para o modelo
         context_lines = []
 
+        if new_epics:
+            context_lines.append("=== NOVOS ÉPICOS ===")
+            for epic in new_epics:
+                resp = epic["assignee"] or "sem responsável"
+                context_lines.append(
+                    f"- Épico {epic['key']}: {epic['summary']} | Status: {epic['status']} | Responsável: {resp}"
+                )
+
         if new_sprint:
-            context_lines.append("=== NOVOS CARDS NA SPRINT ===")
+            context_lines.append("\n=== NOVOS CARDS NA SPRINT ===")
             for item in new_sprint:
                 i = item["issue"]
                 sp = f"{i['story_points']} pts" if i["story_points"] else "sem estimativa"
                 resp = i["assignee"] or "sem responsável"
                 reporter = i.get("reporter") or "desconhecido"
+                epic_label = f"{i['epic']['summary']}" if i.get("epic") else "sem épico"
                 context_lines.append(
-                    f"- {i['key']}: {i['summary']} | Status: {i['status']} | Responsável: {resp} | Relator: {reporter} | SP: {sp} | Sprint: {i['sprint'] or 'backlog'}"
+                    f"- {i['key']}: {i['summary']} | Épico: {epic_label} | Status: {i['status']} | Responsável: {resp} | Relator: {reporter} | SP: {sp}"
                 )
 
         if new_backlog:
@@ -229,8 +279,9 @@ def generate_ai_summary(
                 sp = f"{i['story_points']} pts" if i["story_points"] else "sem estimativa"
                 resp = i["assignee"] or "sem responsável"
                 reporter = i.get("reporter") or "desconhecido"
+                epic_label = f"{i['epic']['summary']}" if i.get("epic") else "sem épico"
                 context_lines.append(
-                    f"- {i['key']}: {i['summary']} | Status: {i['status']} | Responsável: {resp} | Relator: {reporter} | SP: {sp}"
+                    f"- {i['key']}: {i['summary']} | Épico: {epic_label} | Status: {i['status']} | Responsável: {resp} | Relator: {reporter} | SP: {sp}"
                 )
 
         if changed:
@@ -240,17 +291,18 @@ def generate_ai_summary(
                 mudancas = "; ".join(
                     c.replace("*", "").replace("`", "") for c in item["changes"]
                 )
-                context_lines.append(f"- {i['key']}: {i['summary']} | {mudancas}")
+                epic_label = f"{i['epic']['summary']}" if i.get("epic") else "sem épico"
+                context_lines.append(f"- {i['key']}: {i['summary']} | Épico: {epic_label} | {mudancas}")
 
         context = "\n".join(context_lines)
 
         prompt = (
-            "Você é um Scrum Master experiente fazendo o resumo diario da equipe.\n"
+            "Você é um Scrum Master experiente fazendo o resumo diário da equipe de produto.\n"
             "Com base nos dados de hoje do Jira abaixo, escreva um relatório executivo "
             "em português, em linguagem natural e fluida (não use listas de tópicos), "
-            "como se estivesse falando para o time no começo do dia.\n"
-            "Mencione: o que está em andamento, o que foi concluído ou mudou, "
-            "quem está tocando o queêê, e se há pontos de atenção ou riscos.\n"
+            "como se estivesse falando para o time de Produto no começo do dia.\n"
+            "Organize mentalmente por épico ao falar sobre o progresso, destacando "
+            "quais épicos avançaram, quem está tocando o quê, e se há pontos de atenção ou riscos.\n"
             "Use no máximo 5 parágrafos curtos. Não repita os IDs dos cards no corpo do texto.\n\n"
             f"{context}"
         )
@@ -302,7 +354,6 @@ def _compact_issue_line(issue: dict, changes: list | None = None) -> str:
     status = f" • `{issue['status']}`"
     line = f"<{issue['link']}|{issue['key']}> — {issue['summary']}{status}{resp}{reporter}{sp}"
     if changes:
-        # Resume cada mudança em texto simples
         change_summary = "; ".join(
             c.replace("*", "").replace("`", "") for c in changes
         )
@@ -310,14 +361,32 @@ def _compact_issue_line(issue: dict, changes: list | None = None) -> str:
     return line
 
 
+def _group_by_epic(items: list) -> dict:
+    """
+    Agrupa uma lista de {'issue': ...} por épico.
+    Retorna OrderedDict: {'Nome do Épico (MB-xx)': [item, ...], 'Sem épico': [...]}
+    """
+    from collections import defaultdict
+    groups = defaultdict(list)
+    for item in items:
+        epic = item["issue"].get("epic")
+        if epic:
+            label = f"{epic['summary']} ({epic['key']})"
+        else:
+            label = "— Sem épico"
+        groups[label].append(item)
+    return dict(groups)
+
+
 def build_slack_payload(
     new_sprint: list,
     new_backlog: list,
     changed: list,
+    new_epics: list,
     ai_summary: str | None,
 ) -> dict:
     now = datetime.now(timezone.utc).strftime("%d/%m/%Y às %H:%Mh UTC")
-    total = len(new_sprint) + len(new_backlog) + len(changed)
+    total = len(new_sprint) + len(new_backlog) + len(changed) + len(new_epics)
 
     blocks = [
         {
@@ -334,9 +403,8 @@ def build_slack_payload(
         {"type": "divider"},
     ]
 
-    # --- BLOCO PRINCIPAL: resümo da IA em prosa ---
+    # --- BLOCO PRINCIPAL: Resumo da IA em prosa ---
     if ai_summary:
-        # Slack tem limite de 3000 chars por bloco; cortamos se necessário
         summary_text = ai_summary[:2900] + "…" if len(ai_summary) > 2900 else ai_summary
         blocks += [
             {
@@ -346,34 +414,47 @@ def build_slack_payload(
             {"type": "divider"},
         ]
     else:
-        # Sem IA: mostra aviso
         blocks.append({
             "type": "context",
             "elements": [{"type": "mrkdwn", "text": "_🤖 Gemini não configurado — apenas lista de referência_"}],
         })
 
-    # --- APÊNDICE COMPACTO: lista de referência ---
+    # --- APÊNDICE COMPACTO agrupado por épico ---
     appendix_lines = []
 
+    # Novos Épicos (se houver)
+    if new_epics:
+        appendix_lines.append(f"\n*🟣 Novos Épicos ({len(new_epics)})*")
+        for epic in new_epics:
+            resp = f" • 👤 {epic['assignee']}" if epic["assignee"] else ""
+            reporter = f" • ✍️ {epic['reporter']}" if epic.get("reporter") else ""
+            appendix_lines.append(f"<{epic['link']}|{epic['key']}> — {epic['summary']} • `{epic['status']}`{resp}{reporter}")
+
+    def _render_grouped(items: list, title: str):
+        """Renderiza uma seção agrupada por épico."""
+        groups = _group_by_epic(items)
+        appendix_lines.append(f"\n{title}")
+        for epic_label, group_items in groups.items():
+            appendix_lines.append(f"  *🟡 {epic_label}*")
+            for item in group_items:
+                line = _compact_issue_line(
+                    item["issue"],
+                    item.get("changes")
+                )
+                # indenta levemente para ficar dentro do grupo
+                appendix_lines.append(f"  {line}")
+
     if new_sprint:
-        appendix_lines.append(f"\n*🆕 Novos na Sprint ({len(new_sprint)})*")
-        for item in new_sprint:
-            appendix_lines.append(_compact_issue_line(item["issue"]))
+        _render_grouped(new_sprint, f"*🆕 Novos na Sprint ({len(new_sprint)})*")
 
     if new_backlog:
-        appendix_lines.append(f"\n*📋 Novos no Backlog ({len(new_backlog)})*")
-        for item in new_backlog:
-            appendix_lines.append(_compact_issue_line(item["issue"]))
+        _render_grouped(new_backlog, f"*📋 Novos no Backlog ({len(new_backlog)})*")
 
     if changed:
-        appendix_lines.append(f"\n*� Atualizados ({len(changed)})*")
-        for item in changed:
-            appendix_lines.append(_compact_issue_line(item["issue"], item["changes"]))
+        _render_grouped(changed, f"*🔄 Atualizados ({len(changed)})*")
 
     if appendix_lines:
-        # Slack: máx 3000 chars por bloco de texto
         appendix_text = "\n".join(appendix_lines)
-        # Quebra em chunks de 2800 chars se necessário
         chunks = [appendix_text[i:i+2800] for i in range(0, len(appendix_text), 2800)]
         for chunk in chunks:
             blocks.append({
@@ -462,12 +543,12 @@ def main():
 
     print("Buscando issues no Jira (sprint ativa + backlog)...")
     try:
-        raw_issues = get_all_issues()
+        raw_issues, new_epics = get_all_issues()
     except Exception as e:
         print(f"Erro ao buscar issues no Jira: {e}")
         return
 
-    print(f"{len(raw_issues)} issue(s) encontrada(s).")
+    print(f"{len(raw_issues)} issue(s) + {len(new_epics)} épico(s) encontrado(s).")
 
     last_state = load_last_state()
     current_state = {}
@@ -487,6 +568,7 @@ def main():
             "assignee": issue["assignee"],
             "story_points": issue["story_points"],
             "sprint": issue["sprint"],
+            "epic": issue.get("epic"),
         }
 
         if key not in last_state:
@@ -511,16 +593,14 @@ def main():
     ai_summary = None
     if GEMINI_API_KEY:
         print("Gerando sumário com Gemini...")
-        ai_summary = generate_ai_summary(new_sprint, new_backlog, changed)
+        ai_summary = generate_ai_summary(new_sprint, new_backlog, changed, new_epics)
 
-
-    payload = build_slack_payload(new_sprint, new_backlog, changed, ai_summary)
+    payload = build_slack_payload(new_sprint, new_backlog, changed, new_epics, ai_summary)
     send_alert(payload)
 
     print(
-        f"Alertas enviados: {len(new_sprint)} novo(s) na sprint, "
-        f"{len(new_backlog)} novo(s) no backlog, "
-        f"{len(changed)} atualização(ões)."
+        f"Alertas enviados: {len(new_epics)} épico(s), {len(new_sprint)} novo(s) na sprint, "
+        f"{len(new_backlog)} novo(s) no backlog, {len(changed)} atualização(ões)."
     )
 
     save_current_state(current_state)
