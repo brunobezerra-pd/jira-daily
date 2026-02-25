@@ -2,8 +2,8 @@ name: Jira Daily Status Tracker
 
 on:
   schedule:
-    # Executa todos os dias úteis às 8h UTC (aproximadamente 5h no Brasil)
-    - cron: '0 8 * * 1-5'
+    # Executa todos os dias úteis às 8h BRT (UTC-3 = 11h UTC)
+    - cron: '0 11 * * 1-5'
   workflow_dispatch: # Permite execução manual no GitHub
 
 jobs:
@@ -37,6 +37,7 @@ jobs:
         run: python jira_tracker.py
 
       - name: Commit e push das alterações no last_state.json
+        if: false # 🔧 MODO TESTE: desabilitado temporariamente — reativar quando entrar em produção
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
