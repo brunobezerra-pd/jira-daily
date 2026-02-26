@@ -334,16 +334,18 @@ def generate_ai_summary(
         context = "\n".join(context_lines)
 
         prompt = (
-            "Você é um analista ágil gerando um relatório executivo das últimas 24 horas de Sprint para o Product Owner, "
+            "Você é um analista ágil sênior gerando um relatório de fechamento das últimas 24 horas de Sprint para o Product Owner, "
             "Product Manager e Gerente de Tecnologia.\n\n"
-            "Regras:\n"
-            "- Escreva em português, em 3–4 parágrafos objetivos e concisos.\n"
-            "- Não use saudções, não se dirija ao time; escreva como um relatório, não como um discurso.\n"
-            "- Priorize na ordem: Concluído > Ready for Production > Staging > Code Review > Em Andamento > Pendente.\n"
-            "- Agrupe por épico onde possível.\n"
-            "- Destaque itens sem responsável ou sem estimativa como riscos.\n"
-            "- Não repita os IDs dos cards no texto.\n\n"
-            f"{context}"
+            "Regras de Tom e Formatação:\n"
+            "- Escreva em português do Brasil, de forma dinâmica e agradável, como uma 'conversa executiva rápida' no Slack.\n"
+            "- Intercale texto corrido com listas (bullet points) onde fizer sentido (ex: listas de entregas, mudanças ou riscos) em vez de apenas blocos maçantes de texto.\n"
+            "- Evite saudações longas, vá direto aos acontecimentos.\n"
+            "- A narrativa deve seguir o fluxo: Concluído > Ready for Prod > Staging > Code Review > Em Andamento > Pendente.\n"
+            "- Reflita os progressos sempre agrupando em torno dos Épicos (se houver epic), para dar visibilidade de negócio.\n"
+            "- Sinalize taticamente itens sem responsável ou sem estimativa (sem story points) como pontos de atenção.\n"
+            "- Não cite as chaves lógicas dos cards (ex: MB-123) no meio do texto, fale sobre o título ou o que a tarefa faz.\n"
+            "- Encerre o relatório com uma breve 'Sugestão para a Daily', apontando 1 ou 2 tópicos críticos que o PO/PM deve puxar hoje com o time baseados nos dados.\n\n"
+            f"=== DADOS BRUTOS DA SPRINT ===\n{context}"
         )
 
         # Tenta modelo estável, com fallback
