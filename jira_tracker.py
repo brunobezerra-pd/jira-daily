@@ -45,17 +45,23 @@ def _search(jql: str) -> list:
         "jql": jql,
         "fields": [
             "summary", "status", "assignee", "reporter",
-            "story_points", "customfield_10016", "customfield_10028",
             "customfield_10020",   # sprint info
             "customfield_10014",   # epic link (legacy)
             "parent",              # pai direto (moderno — epic vem aqui)
             "issuetype", "priority"
-        ],
+        ] + STORY_POINTS_FIELDS,
         "maxResults": 200,
     }
     response = requests.post(url, headers=headers, json=payload, auth=auth)
     response.raise_for_status()
-    return response.json().get("issues", [])
+    issues = response.json().get("issues", [])
+    if issues and not os.environ.get("_RAW_LOG_DONE"):
+        # Loga a primeira issue na íntegra no Actions pra não ter que ficar caçando
+        print("[DIAGNÓSTICO GERAL] Campos disponiveis na primeira issue:")
+        print(json.dumps(issues[0].get("fields", {}), indent=2))
+        os.environ["_RAW_LOG_DONE"] = "1"
+    return issues
+
 
 
 def get_all_issues() -> tuple[list, list]:
