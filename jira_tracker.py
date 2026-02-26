@@ -43,13 +43,7 @@ def _search(jql: str) -> list:
     headers = {"Accept": "application/json", "Content-Type": "application/json"}
     payload = {
         "jql": jql,
-        "fields": [
-            "summary", "status", "assignee", "reporter",
-            "customfield_10020",   # sprint info
-            "customfield_10014",   # epic link (legacy)
-            "parent",              # pai direto (moderno — epic vem aqui)
-            "issuetype", "priority"
-        ] + STORY_POINTS_FIELDS,
+        "fields": ["*all"],
         "maxResults": 200,
     }
     response = requests.post(url, headers=headers, json=payload, auth=auth)
