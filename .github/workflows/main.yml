@@ -37,7 +37,6 @@ jobs:
         run: python jira_tracker.py
 
       - name: Commit e push das alterações no last_state.json
-        if: false # 🔧 MODO TESTE: desabilitado temporariamente — reativar quando entrar em produção
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
