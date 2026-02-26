@@ -24,6 +24,7 @@ LAST_STATE_FILE = "last_state.json"
 # Campo de story points varia por instância do Jira.
 # Lista dos customfields mais comuns (em ordem de prioridade).
 STORY_POINTS_FIELDS = [
+    "customfield_10043",  # Encontrado nos logs do usuário
     "customfield_10016",  # Jira Software cloud (mais comum)
     "customfield_10028",  # variante comum
     "customfield_10034",  # outra variante
@@ -43,17 +44,18 @@ def _search(jql: str) -> list:
     headers = {"Accept": "application/json", "Content-Type": "application/json"}
     payload = {
         "jql": jql,
-        "fields": ["*all"],
+        "fields": [
+            "summary", "status", "assignee", "reporter",
+            "customfield_10020",   # sprint info
+            "customfield_10014",   # epic link (legacy)
+            "parent",              # pai direto (moderno — epic vem aqui)
+            "issuetype", "priority"
+        ] + STORY_POINTS_FIELDS,
         "maxResults": 200,
     }
     response = requests.post(url, headers=headers, json=payload, auth=auth)
     response.raise_for_status()
     issues = response.json().get("issues", [])
-    if issues and not os.environ.get("_RAW_LOG_DONE"):
-        # Loga a primeira issue na íntegra no Actions pra não ter que ficar caçando
-        print("[DIAGNÓSTICO GERAL] Campos disponiveis na primeira issue:")
-        print(json.dumps(issues[0].get("fields", {}), indent=2))
-        os.environ["_RAW_LOG_DONE"] = "1"
     return issues
 
 
