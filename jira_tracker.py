@@ -334,12 +334,12 @@ def generate_ai_summary(
         context = "\n".join(context_lines)
 
         prompt = (
-            "Você é um analista ágil sênior gerando um relatório de fechamento das últimas 24 horas de Sprint para o Product Owner, "
+            "Você é um analista ágil extremamente direto gerando um relatório de andamento de Sprints para o C-Level, "
             "Product Manager e Gerente de Tecnologia.\n\n"
             "Regras de Tom e Formatação:\n"
-            "- Escreva em português do Brasil, de forma dinâmica e agradável, como uma 'conversa executiva rápida' no Slack.\n"
-            "- Intercale texto corrido com listas (bullet points) onde fizer sentido (ex: listas de entregas, mudanças ou riscos) em vez de apenas blocos maçantes de texto.\n"
-            "- Evite saudações longas, vá direto aos acontecimentos.\n"
+            "- Seja puramente executivo, objetivo e factual. Abandone QUALQUER tom conversacional, coloquial ou empolgado (NÃO use 'E aí, time', NÃO use 'Bora lá', NÃO use 'Ufa!', 'Fresquinhas', etc).\n"
+            "- O relatório DEVE começar diretamente no conteúdo da análise, sem saudações ou introduções amistosas.\n"
+            "- Intercale blocos de texto extremamente sucintos com listas (bullet points) das entregas, mudanças ou riscos.\n"
             "- A narrativa deve seguir o fluxo: Concluído > Ready for Prod > Staging > Code Review > Em Andamento > Pendente.\n"
             "- Reflita os progressos sempre agrupando em torno dos Épicos (se houver epic), para dar visibilidade de negócio.\n"
             "- Sinalize taticamente itens sem responsável ou sem estimativa (sem story points) como pontos de atenção.\n"
@@ -361,6 +361,8 @@ def generate_ai_summary(
                 import re
                 text = re.sub(r'\*\*(.+?)\*\*', r'*\1*', text)   # **bold** → *bold*
                 text = re.sub(r'#{1,6}\s*(.+)', r'*\1*', text)    # # Título → *Título*
+                text = re.sub(r'(?m)^(\s*)\*\s+', r'\1• ', text)  # * list → • list
+                text = re.sub(r'(?m)^(\s*)-\s+', r'\1• ', text)   # - list → • list
                 return text
             except Exception as model_err:
                 print(f"Modelo {model_name} falhou: {model_err}")
@@ -469,11 +471,20 @@ def build_slack_payload(
 
     # --- IA em prosa ---
     if ai_summary and ai_summary != "__GEMINI_ERROR__":
-        summary_text = ai_summary[:2900] + "…" if len(ai_summary) > 2900 else ai_summary
-        blocks += [
-            {"type": "section", "text": {"type": "mrkdwn", "text": f"🤖 *Análise do Gemini*\n\n{summary_text}"}},
-            {"type": "divider"},
-        ]
+        blocks.append({"type": "section", "text": {"type": "mrkdwn", "text": "🤖 *Análise do Gemini*"}})
+        
+        current_chunk = ""
+        for line in ai_summary.split("\n"):
+            if len(current_chunk) + len(line) + 1 > 2900:
+                blocks.append({"type": "section", "text": {"type": "mrkdwn", "text": current_chunk.strip()}})
+                current_chunk = line + "\n"
+            else:
+                current_chunk += line + "\n"
+        
+        if current_chunk.strip():
+            blocks.append({"type": "section", "text": {"type": "mrkdwn", "text": current_chunk.strip()}})
+            
+        blocks.append({"type": "divider"})
     elif ai_summary == "__GEMINI_ERROR__":
         blocks.append({
             "type": "context",
