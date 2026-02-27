@@ -1,4 +1,267 @@
 {
+    "MB-4455": {
+        "status": "EM ANDAMENTO",
+        "summary": "[B] Atualização Zod",
+        "assignee": "Bruno Franco Puzoni",
+        "story_points": 8,
+        "sprint": "Sprint 36",
+        "epic": null
+    },
+    "MB-4398": {
+        "status": "Tarefas pendentes",
+        "summary": "[B] Mapeamento de novos campos Instagram",
+        "assignee": "Flávio Neto",
+        "story_points": 2,
+        "sprint": "Sprint 36",
+        "epic": {
+            "key": "MB-4167",
+            "summary": "Propostas v2"
+        }
+    },
+    "MB-4379": {
+        "status": "EM ANDAMENTO",
+        "summary": "[B] Adição dos templates de keynote MIS",
+        "assignee": "Flávio Neto",
+        "story_points": null,
+        "sprint": "Sprint 36",
+        "epic": {
+            "key": "MB-4167",
+            "summary": "Propostas v2"
+        }
+    },
+    "MB-4450": {
+        "status": "Concluído",
+        "summary": "[B] - Configuração ambiente.",
+        "assignee": "Eduardo Farias",
+        "story_points": null,
+        "sprint": "Sprint 36",
+        "epic": null
+    },
+    "MB-4475": {
+        "status": "EM ANDAMENTO",
+        "summary": "[F] Criar rota para listar convites de um workspace",
+        "assignee": null,
+        "story_points": null,
+        "sprint": "Sprint 36",
+        "epic": null
+    },
+    "MB-4476": {
+        "status": "EM ANDAMENTO",
+        "summary": "[B] Criar FetchWorkspaceInvitesController",
+        "assignee": null,
+        "story_points": null,
+        "sprint": "Sprint 36",
+        "epic": null
+    },
+    "MB-4417": {
+        "status": "EM ANDAMENTO",
+        "summary": "Listar convites do Workspace",
+        "assignee": "Rafael Zago",
+        "story_points": 3,
+        "sprint": "Sprint 36",
+        "epic": {
+            "key": "MB-4430",
+            "summary": "Workspace"
+        }
+    },
+    "MB-4227": {
+        "status": "CODE REVIEW",
+        "summary": "Listagem dos Workspaces de um membro",
+        "assignee": "Rafael Zago",
+        "story_points": 3,
+        "sprint": "Sprint 36",
+        "epic": {
+            "key": "MB-4430",
+            "summary": "Workspace"
+        }
+    },
+    "MB-4419": {
+        "status": "CODE REVIEW",
+        "summary": "Listar membros do Workspace",
+        "assignee": "Rafael Zago",
+        "story_points": 3,
+        "sprint": "Sprint 36",
+        "epic": {
+            "key": "MB-4430",
+            "summary": "Workspace"
+        }
+    },
+    "MB-4474": {
+        "status": "Tarefas pendentes",
+        "summary": "[F] Implementar rota para listar membros do workspace",
+        "assignee": null,
+        "story_points": null,
+        "sprint": "Sprint 36",
+        "epic": null
+    },
+    "MB-4473": {
+        "status": "Tarefas pendentes",
+        "summary": "[B] Implementar FetchWorkspaceMembersHandler",
+        "assignee": null,
+        "story_points": null,
+        "sprint": "Sprint 36",
+        "epic": null
+    },
+    "MB-4472": {
+        "status": "Tarefas pendentes",
+        "summary": "[F] Edição de notificação do tipo campanha",
+        "assignee": "Rodrigo Klein",
+        "story_points": null,
+        "sprint": "Sprint 36",
+        "epic": null
+    },
+    "MB-4471": {
+        "status": "Tarefas pendentes",
+        "summary": "[F] Ações de enviar e excluir notificação",
+        "assignee": "Rodrigo Klein",
+        "story_points": null,
+        "sprint": "Sprint 36",
+        "epic": null
+    },
+    "MB-4470": {
+        "status": "Tarefas pendentes",
+        "summary": "[F] Listagem das notificações + Filtros",
+        "assignee": "Rodrigo Klein",
+        "story_points": null,
+        "sprint": "Sprint 36",
+        "epic": null
+    },
+    "MB-4469": {
+        "status": "Tarefas pendentes",
+        "summary": "[F] Criação das notificações",
+        "assignee": "Rodrigo Klein",
+        "story_points": null,
+        "sprint": "Sprint 36",
+        "epic": null
+    },
+    "MB-4467": {
+        "status": "Tarefas pendentes",
+        "summary": "[F] Integrar gestão de notificações com o SDK",
+        "assignee": "Rodrigo Klein",
+        "story_points": null,
+        "sprint": "Sprint 36",
+        "epic": {
+            "key": "MB-4267",
+            "summary": "Gestão de notificações"
+        }
+    },
+    "MB-4200": {
+        "status": "Ready for production",
+        "summary": "[F] Cancelar pedidos de pagamento na aba do Financeiro",
+        "assignee": "Bruno Franco Puzoni",
+        "story_points": 3,
+        "sprint": "Sprint 36",
+        "epic": {
+            "key": "MB-3924",
+            "summary": "Wallet"
+        }
+    },
+    "MB-4324": {
+        "status": "Ready for production",
+        "summary": "[F] Visualização de notificação enviada (campanha)",
+        "assignee": "Rodrigo Klein",
+        "story_points": 3,
+        "sprint": "Sprint 36",
+        "epic": {
+            "key": "MB-4267",
+            "summary": "Gestão de notificações"
+        }
+    },
+    "MB-4307": {
+        "status": "Ready for production",
+        "summary": "[F] Filtros para edição de notificação do tipo geral",
+        "assignee": "Rodrigo Klein",
+        "story_points": 8,
+        "sprint": "Sprint 36",
+        "epic": {
+            "key": "MB-4267",
+            "summary": "Gestão de notificações"
+        }
+    },
+    "MB-4284": {
+        "status": "Ready for staging",
+        "summary": "[F] Visualização de notificação enviada (geral)",
+        "assignee": "Rodrigo Klein",
+        "story_points": 3,
+        "sprint": "Sprint 36",
+        "epic": {
+            "key": "MB-4267",
+            "summary": "Gestão de notificações"
+        }
+    },
+    "MB-4456": {
+        "status": "CODE REVIEW",
+        "summary": "[F] Adicionar feature flag para exportar defesas não implementadas",
+        "assignee": "Rodrigo Klein",
+        "story_points": 2,
+        "sprint": "Sprint 36",
+        "epic": null
+    },
+    "MB-4390": {
+        "status": "EM ANDAMENTO",
+        "summary": "Revisar Auto Scaling/HPA em Kubernetes",
+        "assignee": "Victor Souza",
+        "story_points": null,
+        "sprint": "Sprint 36",
+        "epic": null
+    },
+    "MB-4320": {
+        "status": "EM ANDAMENTO",
+        "summary": "[B] Endpoint para marcar uma notificação como lida para o creator",
+        "assignee": "glauber.bispo",
+        "story_points": 2,
+        "sprint": "Sprint 36",
+        "epic": {
+            "key": "MB-4267",
+            "summary": "Gestão de notificações"
+        }
+    },
+    "MB-4375": {
+        "status": "Concluído",
+        "summary": "Upgrade Keycloak para v26 ",
+        "assignee": "Victor Souza",
+        "story_points": null,
+        "sprint": "Sprint 36",
+        "epic": null
+    },
+    "MB-4435": {
+        "status": "CODE REVIEW",
+        "summary": "[B] [SPIKE] Criar módulo de validação com IA que vai substituir o content-guard no Campaign Service",
+        "assignee": "Cassiano Peixoto",
+        "story_points": 5,
+        "sprint": "Sprint 36",
+        "epic": {
+            "key": "MB-3311",
+            "summary": "Evolucões com IA"
+        }
+    },
+    "MB-4460": {
+        "status": "CODE REVIEW",
+        "summary": "[B] Atualização do Prisma",
+        "assignee": "Bruno Franco Puzoni",
+        "story_points": 3,
+        "sprint": "Sprint 36",
+        "epic": null
+    },
+    "MB-4442": {
+        "status": "CODE REVIEW",
+        "summary": "[B] Persistência dos estimates para recrutamentos",
+        "assignee": "Flávio Neto",
+        "story_points": 3,
+        "sprint": "Sprint 36",
+        "epic": null
+    },
+    "MB-4333": {
+        "status": "CODE REVIEW",
+        "summary": "[B] Persistir notificações transacionais em CreatorNotifications",
+        "assignee": "glauber.bispo",
+        "story_points": 5,
+        "sprint": "Sprint 36",
+        "epic": {
+            "key": "MB-4267",
+            "summary": "Gestão de notificações"
+        }
+    },
     "MB-4403": {
         "status": "Concluído",
         "summary": "[APP] - Ajustar header da tela de comprovante de envio de nota fiscal",
@@ -22,28 +285,6 @@
         "story_points": 5,
         "sprint": "Sprint 36",
         "epic": null
-    },
-    "MB-4284": {
-        "status": "CODE REVIEW",
-        "summary": "[F] Visualização de notificação enviada (geral)",
-        "assignee": "Rodrigo Klein",
-        "story_points": 3,
-        "sprint": "Sprint 36",
-        "epic": {
-            "key": "MB-4267",
-            "summary": "Gestão de notificações"
-        }
-    },
-    "MB-4227": {
-        "status": "EM ANDAMENTO",
-        "summary": "Listagem dos Workspaces de um membro",
-        "assignee": "Rafael Zago",
-        "story_points": 3,
-        "sprint": "Sprint 36",
-        "epic": {
-            "key": "MB-4430",
-            "summary": "Workspace"
-        }
     },
     "MB-4414": {
         "status": "CODE REVIEW",
@@ -96,46 +337,11 @@
         "sprint": "Sprint 36",
         "epic": null
     },
-    "MB-4379": {
-        "status": "Tarefas pendentes",
-        "summary": "[B] Adição dos templates de keynote MIS",
-        "assignee": "Flávio Neto",
-        "story_points": null,
-        "sprint": "Sprint 36",
-        "epic": {
-            "key": "MB-4167",
-            "summary": "Propostas v2"
-        }
-    },
-    "MB-4458": {
-        "status": "Tarefas pendentes",
-        "summary": "[F] Desabilitar opções de Defesas MIS no recrutamento da proposta",
-        "assignee": null,
-        "story_points": null,
-        "sprint": "Sprint 36",
-        "epic": null
-    },
     "MB-4457": {
         "status": "Ready for staging",
         "summary": "[B] Atualizar seed de test do campaign server",
         "assignee": "glauber.bispo",
         "story_points": 1,
-        "sprint": "Sprint 36",
-        "epic": null
-    },
-    "MB-4456": {
-        "status": "Tarefas pendentes",
-        "summary": "[F] Adicionar feature flag para exportar defesas não implementadas",
-        "assignee": null,
-        "story_points": null,
-        "sprint": "Sprint 36",
-        "epic": null
-    },
-    "MB-4455": {
-        "status": "CODE REVIEW",
-        "summary": "[B] Atualização Zod",
-        "assignee": "Bruno Franco Puzoni",
-        "story_points": 3,
         "sprint": "Sprint 36",
         "epic": null
     },
@@ -163,14 +369,6 @@
         "sprint": "Sprint 36",
         "epic": null
     },
-    "MB-4450": {
-        "status": "EM ANDAMENTO",
-        "summary": "[B] - Configuração ambiente.",
-        "assignee": "Eduardo Farias",
-        "story_points": null,
-        "sprint": "Sprint 36",
-        "epic": null
-    },
     "MB-4454": {
         "status": "Concluído",
         "summary": "Investigar incidente com instancia EC2 Gitlab",
@@ -178,28 +376,6 @@
         "story_points": null,
         "sprint": "Sprint 36",
         "epic": null
-    },
-    "MB-4307": {
-        "status": "In Staging",
-        "summary": "[F] Filtros para edição de notificação do tipo geral",
-        "assignee": "Rodrigo Klein",
-        "story_points": 8,
-        "sprint": "Sprint 36",
-        "epic": {
-            "key": "MB-4267",
-            "summary": "Gestão de notificações"
-        }
-    },
-    "MB-4200": {
-        "status": "In Staging",
-        "summary": "[F] Cancelar pedidos de pagamento na aba do Financeiro",
-        "assignee": "Bruno Franco Puzoni",
-        "story_points": 3,
-        "sprint": "Sprint 36",
-        "epic": {
-            "key": "MB-3924",
-            "summary": "Wallet"
-        }
     },
     "MB-4412": {
         "status": "CODE REVIEW",
@@ -210,17 +386,6 @@
         "epic": {
             "key": "MB-4430",
             "summary": "Workspace"
-        }
-    },
-    "MB-4333": {
-        "status": "EM ANDAMENTO",
-        "summary": "[B] Persistir notificações transacionais em CreatorNotifications",
-        "assignee": "glauber.bispo",
-        "story_points": 5,
-        "sprint": "Sprint 36",
-        "epic": {
-            "key": "MB-4267",
-            "summary": "Gestão de notificações"
         }
     },
     "MB-4175": {
@@ -280,14 +445,6 @@
             "summary": "TikTok One Campaign"
         }
     },
-    "MB-4442": {
-        "status": "EM ANDAMENTO",
-        "summary": "[B] Persistência dos estimates para recrutamentos",
-        "assignee": "Flávio Neto",
-        "story_points": 3,
-        "sprint": "Sprint 36",
-        "epic": null
-    },
     "MB-4276": {
         "status": "Ready for staging",
         "summary": "[F] Refactor da validação de celular no mis-web",
@@ -327,47 +484,6 @@
         "story_points": null,
         "sprint": "Sprint 36",
         "epic": null
-    },
-    "MB-4324": {
-        "status": "In Staging",
-        "summary": "[F] Visualização de notificação enviada (campanha)",
-        "assignee": "Rodrigo Klein",
-        "story_points": 3,
-        "sprint": "Sprint 36",
-        "epic": {
-            "key": "MB-4267",
-            "summary": "Gestão de notificações"
-        }
-    },
-    "MB-4398": {
-        "status": "Tarefas pendentes",
-        "summary": "[B] Mapeamento de novos campos Instagram",
-        "assignee": "Flávio Neto",
-        "story_points": 2,
-        "sprint": "Sprint 36",
-        "epic": {
-            "key": "MB-4167",
-            "summary": "Propostas v2"
-        }
-    },
-    "MB-4390": {
-        "status": "EM ANDAMENTO",
-        "summary": "Revisar AS/HPA em Kubernetes",
-        "assignee": "Victor Souza",
-        "story_points": null,
-        "sprint": "Sprint 36",
-        "epic": null
-    },
-    "MB-4435": {
-        "status": "EM ANDAMENTO",
-        "summary": "[B] [SPIKE] Criar módulo de validação com IA que vai substituir o content-guard no Campaign Service",
-        "assignee": "Cassiano Peixoto",
-        "story_points": 5,
-        "sprint": "Sprint 36",
-        "epic": {
-            "key": "MB-3311",
-            "summary": "Evolucões com IA"
-        }
     },
     "MB-4313": {
         "status": "Concluído",
@@ -438,14 +554,6 @@
             "key": "MB-3838",
             "summary": "Comunidades (Backoffice)"
         }
-    },
-    "MB-4375": {
-        "status": "In Staging",
-        "summary": "Upgrade Keycloak para v26 ",
-        "assignee": "Victor Souza",
-        "story_points": null,
-        "sprint": "Sprint 36",
-        "epic": null
     },
     "MB-4395": {
         "status": "CODE REVIEW",
@@ -594,15 +702,52 @@
         "sprint": "Sprint 36",
         "epic": null
     },
-    "MB-4459": {
+    "MB-4466": {
         "status": "Tarefas pendentes",
-        "summary": "[F] [SIC] Adicionar defesas MIS Completa e MIS Simples nas opções de gerar apresentação",
+        "summary": "Calcular campo 'Over/Under (saldo)'",
         "assignee": null,
-        "story_points": 2,
+        "story_points": null,
         "sprint": null,
-        "epic": {
-            "key": "MB-4167",
-            "summary": "Propostas v2"
-        }
+        "epic": null
+    },
+    "MB-4465": {
+        "status": "Tarefas pendentes",
+        "summary": "Calcular 'Custos MIS liberados' a partir dos creators da campanha",
+        "assignee": null,
+        "story_points": null,
+        "sprint": null,
+        "epic": null
+    },
+    "MB-4464": {
+        "status": "Tarefas pendentes",
+        "summary": "Calcular 'Valor liberado' a partir dos paymentReleases válidos",
+        "assignee": null,
+        "story_points": null,
+        "sprint": null,
+        "epic": null
+    },
+    "MB-4463": {
+        "status": "Tarefas pendentes",
+        "summary": "Implementar cálculo do campo 'Valor contratação Microinflus'",
+        "assignee": null,
+        "story_points": null,
+        "sprint": null,
+        "epic": null
+    },
+    "MB-4462": {
+        "status": "Tarefas pendentes",
+        "summary": "Mapear novo campo de \"Valor contratação Microinflus\", no getCampaignByCode",
+        "assignee": null,
+        "story_points": null,
+        "sprint": null,
+        "epic": null
+    },
+    "MB-4461": {
+        "status": "Tarefas pendentes",
+        "summary": "[B] Calcular novos campos de resumo financeiro do projeto",
+        "assignee": null,
+        "story_points": null,
+        "sprint": null,
+        "epic": null
     }
 }
