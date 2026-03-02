@@ -1,4 +1,158 @@
 {
+    "MB-4483": {
+        "status": "EM ANDAMENTO",
+        "summary": "Otimizar creator-server-worker (K8s)",
+        "assignee": "Victor Souza",
+        "story_points": null,
+        "sprint": "Sprint 36",
+        "epic": null
+    },
+    "MB-4390": {
+        "status": "Concluído",
+        "summary": "Revisar Auto Scaling/HPA em Kubernetes",
+        "assignee": "Victor Souza",
+        "story_points": null,
+        "sprint": "Sprint 36",
+        "epic": null
+    },
+    "MB-4454": {
+        "status": "Concluído",
+        "summary": "Investigar incidente com instancia EC2 Gitlab",
+        "assignee": "Victor Souza",
+        "story_points": null,
+        "sprint": "Sprint 36",
+        "epic": null
+    },
+    "MB-4467": {
+        "status": "EM ANDAMENTO",
+        "summary": "[F] Integrar gestão de notificações com o SDK",
+        "assignee": "Rodrigo Klein",
+        "story_points": 5,
+        "sprint": "Sprint 36",
+        "epic": {
+            "key": "MB-4267",
+            "summary": "Gestão de notificações"
+        }
+    },
+    "MB-4450": {
+        "status": "Concluído",
+        "summary": "[B] - Configuração ambiente.",
+        "assignee": "Eduardo Farias",
+        "story_points": 3,
+        "sprint": "Sprint 36",
+        "epic": null
+    },
+    "MB-4478": {
+        "status": "Ready for production",
+        "summary": "[APP] - Fix no form de contrato",
+        "assignee": "Eduardo Farias",
+        "story_points": 2,
+        "sprint": "Sprint 36",
+        "epic": null
+    },
+    "MB-4470": {
+        "status": "EM ANDAMENTO",
+        "summary": "[F] Listagem das notificações + Filtros",
+        "assignee": "Rodrigo Klein",
+        "story_points": null,
+        "sprint": "Sprint 36",
+        "epic": null
+    },
+    "MB-4479": {
+        "status": "EM ANDAMENTO",
+        "summary": "[B] Impelmentar UpdateWorkspaceUsecase",
+        "assignee": "glauber.bispo",
+        "story_points": null,
+        "sprint": "Sprint 36",
+        "epic": null
+    },
+    "MB-4413": {
+        "status": "Tarefas pendentes",
+        "summary": "Editar Workspace",
+        "assignee": null,
+        "story_points": 5,
+        "sprint": "Sprint 36",
+        "epic": {
+            "key": "MB-4430",
+            "summary": "Workspace"
+        }
+    },
+    "MB-4480": {
+        "status": "Tarefas pendentes",
+        "summary": "[F] Implementar form para editar workspace",
+        "assignee": null,
+        "story_points": null,
+        "sprint": "Sprint 36",
+        "epic": null
+    },
+    "MB-4227": {
+        "status": "Ready for staging",
+        "summary": "Listagem dos Workspaces de um membro",
+        "assignee": "Rafael Zago",
+        "story_points": 3,
+        "sprint": "Sprint 36",
+        "epic": {
+            "key": "MB-4430",
+            "summary": "Workspace"
+        }
+    },
+    "MB-4414": {
+        "status": "Ready for staging",
+        "summary": "Retornar Workspace",
+        "assignee": "Rafael Zago",
+        "story_points": 3,
+        "sprint": "Sprint 36",
+        "epic": {
+            "key": "MB-4430",
+            "summary": "Workspace"
+        }
+    },
+    "MB-4412": {
+        "status": "In Staging",
+        "summary": "Criar Workspace",
+        "assignee": "Rafael Zago",
+        "story_points": 5,
+        "sprint": "Sprint 36",
+        "epic": {
+            "key": "MB-4430",
+            "summary": "Workspace"
+        }
+    },
+    "MB-4456": {
+        "status": "In Staging",
+        "summary": "[F] Adicionar feature flag para exportar defesas não implementadas",
+        "assignee": "Rodrigo Klein",
+        "story_points": 2,
+        "sprint": "Sprint 36",
+        "epic": null
+    },
+    "MB-4284": {
+        "status": "In Staging",
+        "summary": "[F] Visualização de notificação enviada (geral)",
+        "assignee": "Rodrigo Klein",
+        "story_points": 3,
+        "sprint": "Sprint 36",
+        "epic": {
+            "key": "MB-4267",
+            "summary": "Gestão de notificações"
+        }
+    },
+    "MB-4477": {
+        "status": "EM ANDAMENTO",
+        "summary": "[APP] - Centralizar informações do app no analytics",
+        "assignee": "Eduardo Farias",
+        "story_points": 3,
+        "sprint": "Sprint 36",
+        "epic": null
+    },
+    "MB-4457": {
+        "status": "Concluído",
+        "summary": "[B] Atualizar seed de test do campaign server",
+        "assignee": "glauber.bispo",
+        "story_points": 1,
+        "sprint": "Sprint 36",
+        "epic": null
+    },
     "MB-4455": {
         "status": "EM ANDAMENTO",
         "summary": "[B] Atualização Zod",
@@ -29,14 +183,6 @@
             "summary": "Propostas v2"
         }
     },
-    "MB-4450": {
-        "status": "Concluído",
-        "summary": "[B] - Configuração ambiente.",
-        "assignee": "Eduardo Farias",
-        "story_points": null,
-        "sprint": "Sprint 36",
-        "epic": null
-    },
     "MB-4475": {
         "status": "EM ANDAMENTO",
         "summary": "[F] Criar rota para listar convites de um workspace",
@@ -56,17 +202,6 @@
     "MB-4417": {
         "status": "EM ANDAMENTO",
         "summary": "Listar convites do Workspace",
-        "assignee": "Rafael Zago",
-        "story_points": 3,
-        "sprint": "Sprint 36",
-        "epic": {
-            "key": "MB-4430",
-            "summary": "Workspace"
-        }
-    },
-    "MB-4227": {
-        "status": "CODE REVIEW",
-        "summary": "Listagem dos Workspaces de um membro",
         "assignee": "Rafael Zago",
         "story_points": 3,
         "sprint": "Sprint 36",
@@ -118,14 +253,6 @@
         "sprint": "Sprint 36",
         "epic": null
     },
-    "MB-4470": {
-        "status": "Tarefas pendentes",
-        "summary": "[F] Listagem das notificações + Filtros",
-        "assignee": "Rodrigo Klein",
-        "story_points": null,
-        "sprint": "Sprint 36",
-        "epic": null
-    },
     "MB-4469": {
         "status": "Tarefas pendentes",
         "summary": "[F] Criação das notificações",
@@ -133,17 +260,6 @@
         "story_points": null,
         "sprint": "Sprint 36",
         "epic": null
-    },
-    "MB-4467": {
-        "status": "Tarefas pendentes",
-        "summary": "[F] Integrar gestão de notificações com o SDK",
-        "assignee": "Rodrigo Klein",
-        "story_points": null,
-        "sprint": "Sprint 36",
-        "epic": {
-            "key": "MB-4267",
-            "summary": "Gestão de notificações"
-        }
     },
     "MB-4200": {
         "status": "Ready for production",
@@ -177,33 +293,6 @@
             "key": "MB-4267",
             "summary": "Gestão de notificações"
         }
-    },
-    "MB-4284": {
-        "status": "Ready for staging",
-        "summary": "[F] Visualização de notificação enviada (geral)",
-        "assignee": "Rodrigo Klein",
-        "story_points": 3,
-        "sprint": "Sprint 36",
-        "epic": {
-            "key": "MB-4267",
-            "summary": "Gestão de notificações"
-        }
-    },
-    "MB-4456": {
-        "status": "CODE REVIEW",
-        "summary": "[F] Adicionar feature flag para exportar defesas não implementadas",
-        "assignee": "Rodrigo Klein",
-        "story_points": 2,
-        "sprint": "Sprint 36",
-        "epic": null
-    },
-    "MB-4390": {
-        "status": "EM ANDAMENTO",
-        "summary": "Revisar Auto Scaling/HPA em Kubernetes",
-        "assignee": "Victor Souza",
-        "story_points": null,
-        "sprint": "Sprint 36",
-        "epic": null
     },
     "MB-4320": {
         "status": "EM ANDAMENTO",
@@ -286,17 +375,6 @@
         "sprint": "Sprint 36",
         "epic": null
     },
-    "MB-4414": {
-        "status": "CODE REVIEW",
-        "summary": "Retornar Workspace",
-        "assignee": "Rafael Zago",
-        "story_points": 3,
-        "sprint": "Sprint 36",
-        "epic": {
-            "key": "MB-4430",
-            "summary": "Workspace"
-        }
-    },
     "MB-4446": {
         "status": "EM ANDAMENTO",
         "summary": "[F] Página para visualizar workspace",
@@ -337,14 +415,6 @@
         "sprint": "Sprint 36",
         "epic": null
     },
-    "MB-4457": {
-        "status": "Ready for staging",
-        "summary": "[B] Atualizar seed de test do campaign server",
-        "assignee": "glauber.bispo",
-        "story_points": 1,
-        "sprint": "Sprint 36",
-        "epic": null
-    },
     "MB-4451": {
         "status": "Concluído",
         "summary": "Criar service para persistência de CreatorNotification",
@@ -368,25 +438,6 @@
         "story_points": null,
         "sprint": "Sprint 36",
         "epic": null
-    },
-    "MB-4454": {
-        "status": "Concluído",
-        "summary": "Investigar incidente com instancia EC2 Gitlab",
-        "assignee": "Victor Souza",
-        "story_points": null,
-        "sprint": "Sprint 36",
-        "epic": null
-    },
-    "MB-4412": {
-        "status": "CODE REVIEW",
-        "summary": "Criar Workspace",
-        "assignee": "Rafael Zago",
-        "story_points": 5,
-        "sprint": "Sprint 36",
-        "epic": {
-            "key": "MB-4430",
-            "summary": "Workspace"
-        }
     },
     "MB-4175": {
         "status": "Concluído",
@@ -700,54 +751,6 @@
         "assignee": "glauber.bispo",
         "story_points": null,
         "sprint": "Sprint 36",
-        "epic": null
-    },
-    "MB-4466": {
-        "status": "Tarefas pendentes",
-        "summary": "Calcular campo 'Over/Under (saldo)'",
-        "assignee": null,
-        "story_points": null,
-        "sprint": null,
-        "epic": null
-    },
-    "MB-4465": {
-        "status": "Tarefas pendentes",
-        "summary": "Calcular 'Custos MIS liberados' a partir dos creators da campanha",
-        "assignee": null,
-        "story_points": null,
-        "sprint": null,
-        "epic": null
-    },
-    "MB-4464": {
-        "status": "Tarefas pendentes",
-        "summary": "Calcular 'Valor liberado' a partir dos paymentReleases válidos",
-        "assignee": null,
-        "story_points": null,
-        "sprint": null,
-        "epic": null
-    },
-    "MB-4463": {
-        "status": "Tarefas pendentes",
-        "summary": "Implementar cálculo do campo 'Valor contratação Microinflus'",
-        "assignee": null,
-        "story_points": null,
-        "sprint": null,
-        "epic": null
-    },
-    "MB-4462": {
-        "status": "Tarefas pendentes",
-        "summary": "Mapear novo campo de \"Valor contratação Microinflus\", no getCampaignByCode",
-        "assignee": null,
-        "story_points": null,
-        "sprint": null,
-        "epic": null
-    },
-    "MB-4461": {
-        "status": "Tarefas pendentes",
-        "summary": "[B] Calcular novos campos de resumo financeiro do projeto",
-        "assignee": null,
-        "story_points": null,
-        "sprint": null,
         "epic": null
     }
 }
